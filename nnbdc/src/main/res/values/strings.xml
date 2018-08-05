@@ -1,0 +1,67 @@
+<resources>
+    <string name="app_name">牛牛背单词</string>
+    <string name="action_settings">配置</string>
+
+   <!-- <string name="service_url">http://192.168.1.213/service/nnbdc-service</string>
+    <string name="sound_base_url">http://192.168.1.213/sound/</string>
+    <string name="updateUrl">http://192.168.1.213/app/ver.json</string>
+    <string name="apkUrl">http://192.168.1.213/app/nnbdc.apk</string>-->
+
+    <string name="service_url">http://211.149.235.208/service/nnbdc-service</string>
+    <string name="sound_base_url">http://211.149.235.208/sound/</string>
+    <string name="updateUrl">http://211.149.235.208/app/ver.json</string>
+    <string name="apkUrl">http://211.149.235.208/app/nnbdc.apk</string>
+
+    <string name="title_activity_login">牛牛背单词</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">密码</string>
+    <string name="action_sign_in">登录或注册</string>
+    <string name="action_sign_in_short">登录</string>
+    <string name="error_invalid_email">Email无效</string>
+    <string name="error_invalid_password">密码太短</string>
+    <string name="error_incorrect_password">密码不正确</string>
+    <string name="error_field_required">此字段为必填字段</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="select_dict">选书</string>
+
+    <string name="words_per_day_prompt">每日单词数</string>
+    <string-array name="words_per_day_arry">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+        <item>75</item>
+        <item>100</item>
+        <item>150</item>
+        <item>200</item>
+        <item>300</item>
+        <item>400</item>
+        <item>500</item>
+    </string-array>
+    <string name="title_activity_bdc">BdcActivity</string>
+
+    <drawable name="dict_default_back_color">#303335</drawable>
+
+    <!--普通按钮配色-->
+    <drawable name="btn_normal">#303335</drawable>
+    <drawable name="btn_pressed">#444444</drawable>
+
+    <!--绿色按钮配色-->
+    <drawable name="green_btn_normal">#335533</drawable>
+    <drawable name="green_btn_pressed">#337733</drawable>
+
+    <!--红色按钮配色-->
+    <drawable name="red_btn_normal">#553333</drawable>
+    <drawable name="red_btn_pressed">#773333</drawable>
+
+    <string name="title_activity_before_bdc">BeforeBdcActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_throw_dice">ThrowDiceActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingTop="0dp">
+
+    <!--中文翻译-->
+    <TextView
+        android:id="@+id/chinese"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="false"
+        android:textColor="@color/dimTextColor" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <!--作者-->
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:maxLength="16"
+            android:textSize="11sp" />
+
+        <!--赞-->
+        <ImageView
+            android:id="@+id/handImg"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp" />
+
+        <TextView
+            android:id="@+id/handCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp" />
+
+        <!--踩-->
+        <ImageView
+            android:id="@+id/footImg"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="20dp" />
+
+        <TextView
+            android:id="@+id/footCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp" />
+
+        <!--删除-->
+        <ImageView
+            android:id="@+id/deleteImg"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="20dp" />
+    </LinearLayout>
+</LinearLayout>

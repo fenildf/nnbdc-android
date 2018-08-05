@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/back"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/main_content"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+
+        </FrameLayout>
+
+        <RadioGroup
+            android:id="@+id/tab_menu"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bottomMenuBackGround"
+            android:orientation="horizontal">
+
+            <!--<RadioButton
+                android:id="@+id/btnStudyProgress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/study_progress"
+                android:gravity="center_horizontal|bottom"
+                android:paddingTop="2dp"
+                android:text="进度"
+                android:textColor="@color/bottom_munu_text_color"
+                android:textSize="12dp" />-->
+
+            <RadioButton
+                android:id="@+id/btnBdc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/study"
+                android:gravity="center_horizontal|bottom"
+                android:paddingTop="2dp"
+                android:text="学习"
+                android:textColor="@color/bottom_munu_text_color"
+                android:textSize="12dp" />
+
+            <RadioButton
+                android:id="@+id/btnRawWord"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/raw_word"
+                android:gravity="center_horizontal|bottom"
+                android:paddingTop="2dp"
+                android:text="生词本"
+                android:textColor="@color/bottom_munu_text_color"
+                android:textSize="12dp" />
+
+            <RadioButton
+                android:id="@+id/btnSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/search"
+                android:gravity="center_horizontal|bottom"
+                android:paddingTop="2dp"
+                android:text="查词"
+                android:textColor="@color/bottom_munu_text_color"
+                android:textSize="12dp" />
+
+
+            <RadioButton
+                android:id="@+id/btnMe"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/me"
+                android:gravity="center_horizontal|bottom"
+                android:paddingTop="2dp"
+                android:text="我"
+                android:textColor="@color/bottom_munu_text_color"
+                android:textSize="12dp" />
+        </RadioGroup>
+
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
+</RelativeLayout>

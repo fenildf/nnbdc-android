@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<color name="colorPrimary">#2f2f2f</color>-->
+    <color name="colorPrimary">#242729</color>
+    <color name="colorPrimaryDark">#1a1d1f</color>
+    <color name="colorAccent">#88555555</color>
+
+    <!-- <color name="back">#2E8ECE</color>-->
+    <color name="back">#242729</color>
+    <color name="level2">#303335</color>
+    <color name="highlight">#404345</color>
+    <color name="defaultTextColor">#aaaaaa</color>
+    <color name="dimTextColor">#777777</color>
+    <color name="moreDimTextColor">#555555</color>
+    <color name="buttonBackground">#1F3195</color>
+    <color name="privilegedDictBackgoundColor">#334433</color>
+    <color name="progressBarBack">#2f2f2f</color>
+    <color name="fieldValue">#F2CA27</color>
+    <color name="currentWord">#F2CA27</color>
+    <color name="dialogText">#F2CA27</color>
+    <color name="textCusorColor">#F2CA27</color>
+    <color name="ciXing">#3F51B5</color>
+    <color name="serialNo">#3F51B5</color>
+    <color name="titleText">#6F51B5</color>
+    <color name="toastBack">#dd000000</color>
+    <color name="toastTextColor">#aaaaaa</color>
+    <color name="defaultButtonTextColor">#777777</color>
+    <color name="bottomMenuTextColorSelected">#F2CA27</color>
+    <color name="bottomMenuBackGround">#012C35</color>
+    <color name="black_overlay">#66000000</color>
+</resources>

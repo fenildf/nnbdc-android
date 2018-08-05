@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:background="#ee223322"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <!--输入提示-->
+        <TextView
+            android:id="@+id/hint"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text=" "
+            android:textColor="@color/defaultTextColor" />
+
+        <!--输入内容-->
+        <EditText
+            android:id="@+id/content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerHorizontal="true"
+            android:ellipsize="end"
+            android:hint="输入翻译内容"
+            android:textColor="@color/colorPrimaryDark"
+            android:textColorHint="@color/black_overlay"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/okBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="确定" />
+
+            <Button
+                android:id="@+id/cancelBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="取消" />
+
+            <ImageView
+                android:id="@+id/btnHelp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:src="@drawable/help" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="当你提交内容时，将扣除一个牛粪\n获得一个赞你将得到一个牛粪\n获得一个踩你将失去一个牛粪\n注意:系统最多保留３个用户提供的翻译，因此当有新的翻译提交时，排在第三名的翻译将被替换掉（按获得的净赞数排名）"
+            android:textColor="@color/defaultTextColor"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

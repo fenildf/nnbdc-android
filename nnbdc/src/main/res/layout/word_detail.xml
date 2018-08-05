@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <!--单词释义-->
+    <TextView
+        android:id="@+id/meaningsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="释义"
+        android:textColor="@color/titleText"
+        android:textSize="14sp" />
+
+    <!--单词释义容器-->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/meanings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:orientation="vertical"></LinearLayout>
+
+    <!--例句-->
+    <TextView
+        android:id="@+id/sentencesLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="例句"
+        android:textColor="@color/titleText"
+        android:textSize="14sp" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/sentences"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:orientation="vertical"></LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/shortDescLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/shortDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

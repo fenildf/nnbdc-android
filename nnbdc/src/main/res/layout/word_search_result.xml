@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:background="#ee223322"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!--单词拼写-->
+                <TextView
+                    android:id="@+id/spell"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:text=" "
+                    android:textColor="@color/dialogText" />
+
+                <!--单词音标-->
+                <TextView
+                    android:id="@+id/pronounce"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:text=" "
+                    android:textColor="@android:color/darker_gray" />
+            </LinearLayout>
+
+            <!--添加到生词本按钮-->
+            <ImageView
+                android:id="@+id/addRawWordBtn"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/plus_white" />
+        </LinearLayout>
+
+        <!--关闭按钮-->
+        <ImageView
+            android:id="@+id/closeBtn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/close" />
+    </LinearLayout>
+
+    <!--单词释义容器-->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/meanings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:orientation="vertical"></LinearLayout>
+
+
+</LinearLayout>
