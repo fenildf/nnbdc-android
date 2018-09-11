@@ -26,20 +26,6 @@
             android:background="@color/bottomMenuBackGround"
             android:orientation="horizontal">
 
-            <!--<RadioButton
-                android:id="@+id/btnStudyProgress"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@drawable/study_progress"
-                android:gravity="center_horizontal|bottom"
-                android:paddingTop="2dp"
-                android:text="进度"
-                android:textColor="@color/bottom_munu_text_color"
-                android:textSize="12dp" />-->
-
             <RadioButton
                 android:id="@+id/btnBdc"
                 android:layout_width="0dp"
@@ -82,6 +68,19 @@
                 android:textColor="@color/bottom_munu_text_color"
                 android:textSize="12dp" />
 
+            <RadioButton
+                android:id="@+id/btnGame"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/game"
+                android:gravity="center_horizontal|bottom"
+                android:paddingTop="2dp"
+                android:text="游戏"
+                android:textColor="@color/bottom_munu_text_color"
+                android:textSize="12dp" />
 
             <RadioButton
                 android:id="@+id/btnMe"

@@ -10,13 +10,14 @@ import android.widget.RadioGroup;
 
 import com.nb.nnbdc.R;
 
-public class MainActivity extends MyActivity {
+public class MainActivity extends MyActivity{
 
     private RadioGroup bottomMenu;
     private RadioButton btnBdc;
     private RadioButton btnRawWord;
     private RadioButton btnMe;
     private RadioButton btnSearch;
+    private RadioButton btnGame;
 
     /**
      * 当点击【学习】按钮时，只有第一次点击才会显示背单词前的页面（这个页面对背单词的流程很重要，因为该页面准备今日的单词），
@@ -75,6 +76,8 @@ public class MainActivity extends MyActivity {
     }
 
     private SearchFragment searchFragment;
+
+    private RussiaFragment russiaFragment;
 
     private MyFragment currentFragment;
 
@@ -154,6 +157,24 @@ public class MainActivity extends MyActivity {
         setTitle("查找单词");
         btnSearch.setChecked(true);
         btnSearch.setAlpha(alphaForEnable);
+    }
+
+    public void switchToGameFragment() {
+        bottomMenu.setVisibility(View.VISIBLE);
+        FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
+        hideAllFragment(fTransaction);
+        if (russiaFragment == null) {
+            russiaFragment = new RussiaFragment();
+            fTransaction.add(R.id.main_content, russiaFragment);
+        } else {
+            fTransaction.show(russiaFragment);
+        }
+        fTransaction.commitAllowingStateLoss();
+        currentFragment = russiaFragment;
+
+        setTitle("游戏");
+        btnGame.setChecked(true);
+        btnGame.setAlpha(alphaForEnable);
     }
 
     public void switchToBeforeBdcFragment() {
@@ -242,6 +263,7 @@ public class MainActivity extends MyActivity {
         btnRawWord = (RadioButton) bottomMenu.findViewById(R.id.btnRawWord);
         btnMe = (RadioButton) bottomMenu.findViewById(R.id.btnMe);
         btnSearch = (RadioButton) bottomMenu.findViewById(R.id.btnSearch);
+        btnGame = (RadioButton) bottomMenu.findViewById(R.id.btnGame);
 
         //学习进度按钮
         btnMe.setOnClickListener(new View.OnClickListener() {
@@ -280,6 +302,14 @@ public class MainActivity extends MyActivity {
             }
         });
 
+        //游戏按钮
+        btnGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchToGameFragment();
+            }
+        });
+
         //设置默认的tab
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
             btnMe.callOnClick();
@@ -294,6 +324,7 @@ public class MainActivity extends MyActivity {
         btnRawWord.setAlpha(alphaForDisable);
         btnMe.setAlpha(alphaForDisable);
         btnSearch.setAlpha(alphaForDisable);
+        btnGame.setAlpha(alphaForDisable);
 
         if (meFragment != null) {
             fTransaction.hide(meFragment);
@@ -320,6 +351,4 @@ public class MainActivity extends MyActivity {
             fTransaction.hide(searchFragment);
         }
     }
-
-
 }

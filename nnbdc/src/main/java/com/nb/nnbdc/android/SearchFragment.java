@@ -1,8 +1,12 @@
 package com.nb.nnbdc.android;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -26,6 +30,7 @@ import com.nb.nnbdc.android.util.WordStore;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.List;
 
 import beidanci.vo.SearchWordResult;
 import beidanci.vo.WordVo;
