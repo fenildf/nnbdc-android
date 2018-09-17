@@ -78,8 +78,17 @@ public class BdcFragment extends MyFragment {
 
     private String fromPage;
 
+    /**
+     * 是否正在显示一个单词的内容？
+     */
+    private boolean isShowingAWord = false;
+
     public void setFromPage(String fromPage) {
         this.fromPage = fromPage;
+    }
+
+    public boolean isShowingAWord() {
+        return isShowingAWord;
     }
 
     @Override
@@ -216,6 +225,11 @@ public class BdcFragment extends MyFragment {
         loadAWordTask.execute((Void) null);
     }
 
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
+    }
+
     /**
      * 获取下一个单词
      */
@@ -275,13 +289,13 @@ public class BdcFragment extends MyFragment {
             getView().findViewById(R.id.answers).setVisibility(View.VISIBLE);
 
             if (result.isFinished()) {
-                ((MainActivity) getActivity()).switchToFinishFragment();
+                ((MainActivity) getActivity()).switchToFinishFragment(BdcFragment.this);
                 return;
             } else if (result.isNoWord()) {
-                ((MainActivity) getActivity()).switchToSelectBookFragment();
+                ((MainActivity) getActivity()).switchToSelectBookFragment(BdcFragment.this);
                 return;
             } else if (result.getShouldEnterReviewMode()) {
-                ((MainActivity) getActivity()).switchToStageReviewFragment();
+                ((MainActivity) getActivity()).switchToStageReviewFragment(BdcFragment.this);
                 return;
             }
 
@@ -319,6 +333,8 @@ public class BdcFragment extends MyFragment {
                 loadAWord();
                 return;
             }
+
+            isShowingAWord = true;
 
             //显示单词拼写及音标
             WordVo word = currentGetWordResult.getLearningWord().getWord();
@@ -566,7 +582,7 @@ public class BdcFragment extends MyFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.selectDict:
-                ((MainActivity) getActivity()).switchToSelectBookFragment();
+                ((MainActivity) getActivity()).switchToSelectBookFragment(BdcFragment.this);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -608,9 +624,9 @@ public class BdcFragment extends MyFragment {
             boolean autoPlaySentence;
             try {
                 UserVo user = Util.getCachedLoggedInUser(getMainActivity());
-                autoPlaySentence= !user.getAutoPlaySentence();
+                autoPlaySentence = !user.getAutoPlaySentence();
                 user.setAutoPlaySentence(autoPlaySentence);
-                Util.saveLoggedInUserToCache(user,getMainActivity());
+                Util.saveLoggedInUserToCache(user, getMainActivity());
 
             } catch (JSONException e) {
                 autoPlaySentence = false;
@@ -619,7 +635,7 @@ public class BdcFragment extends MyFragment {
 
 
             //切换句子自动发音模式后，重新加载
-            ((MainActivity) getActivity()).switchBdcFragment(null, true);
+            ((MainActivity) getActivity()).switchBdcFragment(BdcFragment.this, null, true);
             ToastUtil.showToast(getActivity(), autoPlaySentence ? "句子自动发音" : "句子手动发音");
         }
 

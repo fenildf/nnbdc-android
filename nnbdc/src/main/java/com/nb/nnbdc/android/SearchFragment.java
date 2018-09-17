@@ -91,6 +91,11 @@ public class SearchFragment extends MyFragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
+    }
+
     /**
      * 搜索编辑框内容变化的监听器
      */

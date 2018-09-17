@@ -57,6 +57,11 @@ public class RawWordFragment extends MyFragment {
         setupWordsScrollView();
     }
 
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
+    }
+
 
     public class DeleteRawWordTask extends MyAsyncTask<Void, Void, Result> {
         private int wordWordId;

@@ -65,6 +65,11 @@ public class FinishFragment extends MyFragment {
         daka();
     }
 
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
+    }
+
     /**
      * 获取在学习过程中回答错误的单词
      */
@@ -311,7 +316,7 @@ public class FinishFragment extends MyFragment {
      * 返回到默认页面
      */
     public void returnToDefaultPage() {
-        ((MainActivity) getActivity()).switchToMeFragment();
+        ((MainActivity) getActivity()).switchToMeFragment(FinishFragment.this);
     }
 
     /**

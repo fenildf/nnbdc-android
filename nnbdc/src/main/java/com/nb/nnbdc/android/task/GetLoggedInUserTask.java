@@ -22,6 +22,7 @@ public class GetLoggedInUserTask extends MyAsyncTask<Void, Void, UserVo /*登录
         try {
             return getHttpClient().getLoggedInUser();
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

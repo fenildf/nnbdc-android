@@ -77,6 +77,11 @@ public class StageReviewFragment extends MyFragment {
         });
     }
 
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
+    }
+
     /**
      * 获取本阶段待复习单词
      */
@@ -304,6 +309,6 @@ public class StageReviewFragment extends MyFragment {
      * 继续学习
      */
     public void continueStudy() {
-        ((MainActivity) getActivity()).switchBdcFragment(StageReviewFragment.class.getSimpleName(), true);
+        ((MainActivity) getActivity()).switchBdcFragment(StageReviewFragment.this, StageReviewFragment.class.getSimpleName(), true);
     }
 }

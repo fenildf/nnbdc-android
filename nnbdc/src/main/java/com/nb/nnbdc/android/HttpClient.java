@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import beidanci.vo.DictGroupVo;
+import beidanci.vo.GetGameHallDataResult;
 import beidanci.vo.GetWordResult;
 import beidanci.vo.PagedResults;
 import beidanci.vo.RawWordVo;
@@ -184,6 +185,16 @@ public class HttpClient {
         return Util.getGsonBuilder().create().fromJson(result, objectType);
     }
 
+    public GetGameHallDataResult getGameHallData() throws IOException {
+        String serviceUrl = appContext.getString(R.string.service_url) + "/getGameHallData.do";
+
+        String result = sendAjax(serviceUrl, null, "GET", 30000);
+        Type objectType = new TypeToken<GetGameHallDataResult>() {
+        }.getType();
+        return Util.getGsonBuilder().create().fromJson(result, objectType);
+    }
+
+
     public SearchWordResult searchWord(String spell) throws IOException {
         String serviceUrl = appContext.getString(R.string.service_url) + "/searchWord.do";
         Map<String, Object> requestParams = new HashMap<>();
@@ -247,7 +258,6 @@ public class HttpClient {
         }.getType();
         return Util.getGsonBuilder().create().fromJson(result, objectType);
     }
-
 
 
     public PagedResults<RawWordVo> getRawWordsForAPage(int pageNo, int pageSize) throws IOException {

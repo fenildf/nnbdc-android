@@ -8,9 +8,16 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.github.nkzawa.socketio.client.Ack;
 import com.nb.nnbdc.R;
 
-public class MainActivity extends MyActivity{
+import java.util.LinkedList;
+import java.util.List;
+
+import beidanci.vo.UserVo;
+
+
+public class MainActivity extends MyActivity {
 
     private RadioGroup bottomMenu;
     private RadioButton btnBdc;
@@ -28,6 +35,7 @@ public class MainActivity extends MyActivity{
 
     float alphaForDisable = 0.4f;
     float alphaForEnable = 0.6f;
+
 
     public MeFragment getMeFragment() {
         return meFragment;
@@ -77,11 +85,18 @@ public class MainActivity extends MyActivity{
 
     private SearchFragment searchFragment;
 
+    private GameCenterFragment gameCenterFragment;
     private RussiaFragment russiaFragment;
 
     private MyFragment currentFragment;
 
     private ProgressDialog updateProgress;
+
+    public boolean isUserReportedToSocketServer() {
+        return isUserReportedToSocketServer;
+    }
+
+    private boolean isUserReportedToSocketServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +105,43 @@ public class MainActivity extends MyActivity{
 
         //初始化界面
         initView();
+
+        getAppContext().registerSocketStatusListener(new MyApp.SocketStatusListener() {
+            @Override
+            public void onConnected() {
+                tryReportUserToSocketServer();
+            }
+
+            @Override
+            public void onDisconnected() {
+                tryReportUserToSocketServer();
+            }
+        });
+        tryReportUserToSocketServer();
     }
 
-    public void switchToRawWordFragment() {
+    /**
+     * 向Socket服务器上报用户名(login)
+     */
+    public void tryReportUserToSocketServer() {
+        final MyApp app = getAppContext();
+        final UserVo user = app.getLoggedInUser();
+        if (user == null) throw new AssertionError();
+
+        if (app.isConnectedToSocketServer() && !isUserReportedToSocketServer) {
+            app.getSocket().emit("reportUser", user.getId(), new Ack() {
+                @Override
+                public void call(Object... args) {
+                    isUserReportedToSocketServer = true;
+                }
+            });
+        } else if (!app.isConnectedToSocketServer()) {
+            isUserReportedToSocketServer = false;
+        }
+    }
+
+
+    public void switchToRawWordFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
@@ -107,9 +156,11 @@ public class MainActivity extends MyActivity{
         setTitle("生词本");
         btnRawWord.setChecked(true);
         btnRawWord.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToMeFragment() {
+    public void switchToMeFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
@@ -124,9 +175,11 @@ public class MainActivity extends MyActivity{
         setTitle("我的学习进度");
         btnMe.setChecked(true);
         btnMe.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToSelectBookFragment() {
+    public void switchToSelectBookFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
@@ -139,9 +192,11 @@ public class MainActivity extends MyActivity{
         currentFragment = selectBookFragment;
 
         setTitle("单词书");
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToSearchFragment() {
+    public void switchToSearchFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
@@ -157,45 +212,68 @@ public class MainActivity extends MyActivity{
         setTitle("查找单词");
         btnSearch.setChecked(true);
         btnSearch.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToGameFragment() {
+    public void switchToGameCenterFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
-        if (russiaFragment == null) {
-            russiaFragment = new RussiaFragment();
-            fTransaction.add(R.id.main_content, russiaFragment);
-        } else {
-            fTransaction.show(russiaFragment);
+        if (gameCenterFragment != null) {
+            fTransaction.remove(gameCenterFragment);
         }
+        gameCenterFragment = new GameCenterFragment();
+        fTransaction.add(R.id.main_content, gameCenterFragment);
+        fTransaction.commitAllowingStateLoss();
+        currentFragment = gameCenterFragment;
+
+        setTitle("游戏大厅");
+        btnGame.setChecked(true);
+        btnGame.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
+    }
+
+    public void switchToRussiaFragment(MyFragment from, String hallName, String exceptRoom) {
+        bottomMenu.setVisibility(View.VISIBLE);
+        FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
+        hideAllFragment(fTransaction);
+        if (russiaFragment != null) {
+            fTransaction.remove(russiaFragment);
+        }
+        russiaFragment = new RussiaFragment(hallName, exceptRoom);
+        fTransaction.add(R.id.main_content, russiaFragment);
         fTransaction.commitAllowingStateLoss();
         currentFragment = russiaFragment;
 
         setTitle("游戏");
         btnGame.setChecked(true);
         btnGame.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToBeforeBdcFragment() {
+    public void switchToBeforeBdcFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
-        if (beforeBdcFragment == null) {
-            beforeBdcFragment = new BeforeBdcFragment();
-            fTransaction.add(R.id.main_content, beforeBdcFragment);
-        } else {
-            fTransaction.show(beforeBdcFragment);
+        if (beforeBdcFragment != null) {
+            fTransaction.remove(beforeBdcFragment);
         }
+        beforeBdcFragment = new BeforeBdcFragment();
+        fTransaction.add(R.id.main_content, beforeBdcFragment);
         fTransaction.commitAllowingStateLoss();
         currentFragment = beforeBdcFragment;
 
         setTitle("今日学习计划");
         btnBdc.setChecked(true);
         btnBdc.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchBdcFragment(String fromFragment, boolean recreateFrame) {
+    public void switchBdcFragment(MyFragment from, String fromFragment, boolean recreateFrame) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
@@ -203,7 +281,7 @@ public class MainActivity extends MyActivity{
             fTransaction.remove(bdcFragment);
             bdcFragment = null;
         }
-        if (bdcFragment == null) {
+        if (bdcFragment == null || !bdcFragment.isShowingAWord()) {
             bdcFragment = new BdcFragment();
             fTransaction.add(R.id.main_content, bdcFragment);
             bdcFragment.setFromPage(fromFragment);
@@ -216,9 +294,11 @@ public class MainActivity extends MyActivity{
         setTitle("背单词");
         btnBdc.setChecked(true);
         btnBdc.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToFinishFragment() {
+    public void switchToFinishFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
@@ -233,9 +313,11 @@ public class MainActivity extends MyActivity{
         setTitle("今日学习已完成");
         btnBdc.setChecked(true);
         btnBdc.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToStageReviewFragment() {
+    public void switchToStageReviewFragment(MyFragment from) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);
@@ -250,6 +332,8 @@ public class MainActivity extends MyActivity{
         setTitle("阶段复习");
         btnBdc.setChecked(true);
         btnBdc.setAlpha(alphaForEnable);
+
+        fireFragmentSwitchEvent(from, currentFragment);
     }
 
     @Override
@@ -269,7 +353,7 @@ public class MainActivity extends MyActivity{
         btnMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchToMeFragment();
+                switchToMeFragment(currentFragment);
             }
         });
 
@@ -277,7 +361,7 @@ public class MainActivity extends MyActivity{
         btnRawWord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchToRawWordFragment();
+                switchToRawWordFragment(currentFragment);
             }
         });
 
@@ -285,11 +369,11 @@ public class MainActivity extends MyActivity{
         btnBdc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!hasShownBeforeBdcFrame) {
-                    switchToBeforeBdcFragment();
+                if (!hasShownBeforeBdcFrame || bdcFragment == null || !bdcFragment.isShowingAWord()) {
+                    switchToBeforeBdcFragment(currentFragment);
                     hasShownBeforeBdcFrame = true;
                 } else {
-                    switchBdcFragment(null, false);
+                    switchBdcFragment(currentFragment, null, false);
                 }
             }
         });
@@ -298,7 +382,7 @@ public class MainActivity extends MyActivity{
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchToSearchFragment();
+                switchToSearchFragment(currentFragment);
             }
         });
 
@@ -306,7 +390,7 @@ public class MainActivity extends MyActivity{
         btnGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchToGameFragment();
+                switchToGameCenterFragment(currentFragment);
             }
         });
 
@@ -349,6 +433,30 @@ public class MainActivity extends MyActivity{
         }
         if (searchFragment != null) {
             fTransaction.hide(searchFragment);
+        }
+        if (gameCenterFragment != null) {
+            fTransaction.hide(gameCenterFragment);
+        }
+        if (russiaFragment != null) {
+            fTransaction.hide(russiaFragment);
+        }
+    }
+
+    private List<FragmentSwitchListener> fragmentSwitchListeners = new LinkedList<>();
+
+    public void registerFragmentSwitchListener(FragmentSwitchListener listener) {
+        if (!fragmentSwitchListeners.contains(listener)) {
+            fragmentSwitchListeners.add(listener);
+        }
+    }
+
+    public void unRegisterFragmentSwitchListener(FragmentSwitchListener listener) {
+        fragmentSwitchListeners.remove(listener);
+    }
+
+    private void fireFragmentSwitchEvent(MyFragment from, MyFragment to) {
+        for (FragmentSwitchListener listener : fragmentSwitchListeners) {
+            listener.onFragmentSwitched(from, to);
         }
     }
 }

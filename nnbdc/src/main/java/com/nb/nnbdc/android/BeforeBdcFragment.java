@@ -44,6 +44,11 @@ public class BeforeBdcFragment extends MyFragment {
         });
     }
 
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
+    }
+
     /**
      * 准备今天要学习的单词
      */
@@ -97,6 +102,6 @@ public class BeforeBdcFragment extends MyFragment {
     }
 
     private void startStudy() {
-        ((MainActivity) getActivity()).switchBdcFragment(BeforeBdcFragment.class.getSimpleName(), true);
+        ((MainActivity) getActivity()).switchBdcFragment(BeforeBdcFragment.this, BeforeBdcFragment.class.getSimpleName(), true);
     }
 }

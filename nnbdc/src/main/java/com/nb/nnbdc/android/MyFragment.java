@@ -3,6 +3,8 @@ package com.nb.nnbdc.android;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.ViewGroup;
@@ -20,7 +22,7 @@ import java.util.Date;
 /**
  * Created by Administrator on 2016/2/11.
  */
-public class MyFragment extends Fragment {
+public abstract class MyFragment extends Fragment implements FragmentSwitchListener {
     public HttpClient getHttpClient() {
         return ((MyApp) getActivity().getApplicationContext()).getHttpClient();
     }
@@ -125,5 +127,17 @@ public class MyFragment extends Fragment {
 
     protected interface InputDlgListener {
         void onInput(String content);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getMainActivity().registerFragmentSwitchListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        getMainActivity().unRegisterFragmentSwitchListener(this);
+        super.onDestroy();
     }
 }

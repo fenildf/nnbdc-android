@@ -1,6 +1,7 @@
 package com.nb.nnbdc.android;
 
 import android.os.AsyncTask;
+import android.os.Looper;
 
 import com.nb.nnbdc.android.MyActivity;
 import com.nb.nnbdc.android.util.ToastUtil;
@@ -16,28 +17,40 @@ public abstract class MyAsyncTask<Params, Progress, Result> extends AsyncTask<Pa
         this.myActivity = myActivity;
     }
 
+    private boolean isInMainThread() {
+        return Thread.currentThread() == Looper.getMainLooper().getThread();
+    }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        myActivity.showProgress(true);
+        if (isInMainThread()) {
+            myActivity.showProgress(true);
+        }
     }
 
     @Override
     protected void onPostExecute(Result result) {
         super.onPostExecute(result);
-        myActivity.showProgress(false);
+        if (isInMainThread()) {
+            myActivity.showProgress(false);
+        }
     }
 
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        myActivity.showProgress(false);
+        if (isInMainThread()) {
+            myActivity.showProgress(false);
+        }
     }
 
     @Override
     protected void onCancelled(Result result) {
         super.onCancelled(result);
-        myActivity.showProgress(false);
+        if (isInMainThread()) {
+            myActivity.showProgress(false);
+        }
     }
 
     protected HttpClient getHttpClient() {

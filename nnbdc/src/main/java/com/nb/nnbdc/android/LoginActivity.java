@@ -259,6 +259,7 @@ public class LoginActivity extends MyActivity {
             @Override
             public void onSuccess(UserVo user) {
                 //跳转到主页面
+                getAppContext().setLoggedInUser(user);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

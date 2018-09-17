@@ -118,7 +118,7 @@ public class MeFragment extends MyFragment {
         getView().findViewById(R.id.selectBookBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMainActivity().switchToSelectBookFragment();
+                getMainActivity().switchToSelectBookFragment(MeFragment.this);
             }
         });
 
@@ -133,6 +133,11 @@ public class MeFragment extends MyFragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
     }
 
     public class DeleteDictTask extends MyAsyncTask<View, Void, Boolean> {
@@ -254,7 +259,7 @@ public class MeFragment extends MyFragment {
             if (getView() == null || getActivity() == null) return;
             privilegeDictTask = null;
             if (succ) {
-                ((MainActivity) getActivity()).switchToMeFragment();
+                ((MainActivity) getActivity()).switchToMeFragment(MeFragment.this);
             }
         }
 
@@ -297,9 +302,9 @@ public class MeFragment extends MyFragment {
             if (nextActivity == null) { //前面的步骤发生了异常
                 ToastUtil.showToast(getActivity(), "发生异常，请重试");
             } else if (nextActivity.equals("selectDict")) {
-                ((MainActivity) getActivity()).switchToSelectBookFragment();
+                ((MainActivity) getActivity()).switchToSelectBookFragment(MeFragment.this);
             } else if (nextActivity.equals("beforeBdc")) {
-                ((MainActivity) getActivity()).switchToBeforeBdcFragment();
+                ((MainActivity) getActivity()).switchToBeforeBdcFragment(MeFragment.this);
             }
         }
 

@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--单词书列表-->
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -28,6 +29,7 @@
         </LinearLayout>
     </ScrollView>
 
+    <!--底部按钮-->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -35,22 +37,22 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/okBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/buttonBackground"
-            android:textColor="@color/defaultTextColor"
             android:text="确定"
-            android:id="@+id/okBtn" />
+            android:textColor="@color/defaultTextColor" />
 
         <Button
+            android:id="@+id/cancelBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="1dp"
             android:layout_weight="1"
             android:background="@color/buttonBackground"
-            android:textColor="@color/defaultTextColor"
-            android:layout_marginLeft="1dp"
             android:text="取消"
-            android:id="@+id/cancelBtn" />
+            android:textColor="@color/defaultTextColor" />
     </LinearLayout>
 </LinearLayout>

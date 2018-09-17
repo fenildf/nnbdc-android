@@ -32,7 +32,7 @@ public class SelectBookFragment extends MyFragment {
     /**
      * 所有单词书对应的选择框
      */
-    private List<CheckBox> dictViews = new ArrayList<>();
+    private List<CheckBox> allDictViews = new ArrayList<>();
 
     /**
      * 所有单词书分组（含单词书）
@@ -64,7 +64,7 @@ public class SelectBookFragment extends MyFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        GetDictGroupsTask getDictGroupsTask = new GetDictGroupsTask(getMainActivity());
+        getDictGroupsTask = new GetDictGroupsTask(getMainActivity());
         getDictGroupsTask.execute((Void) null);
 
         getView().findViewById(R.id.okBtn).setOnClickListener(new View.OnClickListener() {
@@ -77,9 +77,14 @@ public class SelectBookFragment extends MyFragment {
         getView().findViewById(R.id.cancelBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) getActivity()).switchToMeFragment();
+                ((MainActivity) getActivity()).switchToMeFragment(SelectBookFragment.this);
             }
         });
+    }
+
+    @Override
+    public void onFragmentSwitched(MyFragment from, MyFragment to) {
+
     }
 
     /**
@@ -108,6 +113,7 @@ public class SelectBookFragment extends MyFragment {
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
+            final MainActivity mainActivity = getMainActivity();
             getDictGroupsTask = null;
             if (getView() == null || getActivity() == null) return;
 
@@ -119,25 +125,47 @@ public class SelectBookFragment extends MyFragment {
 
             for (int i = 0; i < dictGroups.size(); i++) {//每个单词书分组
                 DictGroupVo dictGroup = dictGroups.get(i);
-                if ( !dictGroup.getName().equals("root") && dictGroup.getDictGroup().getName().equals("root")) {
+                if (!dictGroup.getName().equals("root") && dictGroup.getDictGroup().getName().equals("root")) {
                     //显示分组名
                     LinearLayout layout = (LinearLayout) getView().findViewById(R.id.layout);
                     TextView dictGroupView = new TextView(SelectBookFragment.this.getActivity());
                     dictGroupView.setTextColor(ContextCompat.getColor(SelectBookFragment.this.getActivity(), R.color.titleText));
                     dictGroupView.setText(dictGroup.getName());
+                    dictGroupView.setPadding(0, 8, 0, 8);
                     layout.addView(dictGroupView);
+
+                    //点击组名时的事件处理
+                    dictGroupView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            boolean expanded = (boolean) v.getTag(R.id.tag_is_group_expanded);
+                            List<CheckBox> dictViews = (List<CheckBox>) v.getTag(R.id.tag_views_under_group);
+
+                            //展开/收起该组下的单词书列表
+                            for (CheckBox dictView : dictViews) {
+                                dictView.setVisibility(expanded ? View.GONE : View.VISIBLE);
+                            }
+                            v.setTag(R.id.tag_is_group_expanded, !expanded);
+                        }
+                    });
 
                     //显示分组下的所有单词书
                     List<DictVo> dicts = dictGroup.getDicts();
+                    List<CheckBox> groupDictViews = new ArrayList<>();
+                    dictGroupView.setTag(R.id.tag_is_group_expanded, false); // 是否展开显示
+                    dictGroupView.setTag(R.id.tag_views_under_group, groupDictViews); //单词书列表
                     for (int j = 0; j < dicts.size(); j++) {
                         DictVo dict = dicts.get(j);
-                        CheckBox dictView = new CheckBox(SelectBookFragment.this.getActivity());
+                        CheckBox dictView = new CheckBox(mainActivity);
                         dictView.setTextColor(ContextCompat.getColor(SelectBookFragment.this.getActivity(), R.color.defaultTextColor));
                         dictView.setTextSize(12);
                         dictView.setText(dict.getShortName());
                         dictView.setTag(dict);
+                        dictView.setPadding(0, 8, 0, 8);
+                        dictView.setVisibility(View.GONE);
                         layout.addView(dictView);
-                        dictViews.add(dictView);
+                        groupDictViews.add(dictView);
+                        allDictViews.add(dictView);
 
                         //判断单词书是否已被选中
                         for (int k = 0; k < selectedDicts.size(); k++) {
@@ -202,7 +230,7 @@ public class SelectBookFragment extends MyFragment {
 
             try {
                 if (result.getBoolean("success")) {
-                    ((MainActivity) getActivity()).switchToMeFragment();
+                    ((MainActivity) getActivity()).switchToMeFragment(SelectBookFragment.this);
                 } else {
                     ToastUtil.showToast(getActivity(), result.getString("msg"));
                 }
@@ -222,10 +250,10 @@ public class SelectBookFragment extends MyFragment {
         saveConfigUrlAndData = getString(R.string.service_url) + "/saveConfig.do";
         boolean isFirstParam = true;
         HashMap<String, Object> addedDicts = new HashMap<>();//用于去重
-        for (CheckBox dictView : dictViews) {
+        for (CheckBox dictView : allDictViews) {
             if (dictView.isChecked()) {
                 String paramName = isFirstParam ? "?selectedDicts[]=" : "&selectedDicts[]=";
-                String paramValue = ((DictVo)dictView.getTag()).getId().toString();
+                String paramValue = ((DictVo) dictView.getTag()).getId().toString();
                 if (!addedDicts.containsKey(paramValue)) {
                     saveConfigUrlAndData += paramName + paramValue;
                     isFirstParam = false;

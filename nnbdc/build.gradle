@@ -35,4 +35,9 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.0'
     compile 'com.google.code.gson:gson:1.7.2'
     compile 'com.nnbdc:nnbdc-vo:0.0.1-SNAPSHOT'
+    compile 'com.github.nkzawa:socket.io-client:0.5.2'
+    /*compile ('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }*/
 }
