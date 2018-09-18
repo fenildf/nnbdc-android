@@ -2,3 +2,4 @@ build
 .idea
 captures
 **/*.iml
+.gradle
