@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.nb.nnbdc.R;
 import com.nb.nnbdc.android.util.ToastUtil;
@@ -36,6 +37,8 @@ public class RussiaFragment extends MyFragment {
     private Socket socket;
     private String hallName;
     private String exceptRoom;
+
+    UserVo loggedInUser;
 
     public RussiaFragment(String hallName, String exceptRoom) {
         this.hallName = hallName;
@@ -62,8 +65,139 @@ public class RussiaFragment extends MyFragment {
         initGame();
     }
 
-    private void initGame() {
+    private void initSocket() {
         socket = getMainActivity().getAppContext().getSocket();
+        socket.on("sysCmd", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                String cmd = (String) args[0];
+                if (cmd.equals("BEGIN_EXERCISE")) {
+                    isExercise = true;
+                    startGame();
+                    appendMsg(0, "牛牛", "练习开始");
+                } else if (cmd.equals("BEGIN")) {
+                    isExercise = false;
+                    startGame();
+                    appendMsg(0, "牛牛", "比赛开始");
+                } else {
+                    Log.e("", "不支持的命令： " + cmd);
+                }
+            }
+        });
+        socket.on("idleUsers", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                idleUsers = (List<UserVo>) args[0];
+            }
+        });
+        socket.on("userStarted", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                int userId = (int) args[0];
+                if (userId == playerA.userId) {
+                    playerA.started = true;
+                } else {
+                    playerB.started = true;
+                }
+            }
+        });
+        socket.on("giveProps", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (!isExercise) {
+                    try {
+                        JSONArray params = (JSONArray) args[0];
+                        int propsIndex = (Integer) params.get(0);
+                        int propsCount = (int) params.get(1);
+                        playerA.props[propsIndex] = propsCount;
+                    } catch (JSONException e) {
+                        Log.e("", e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        socket.on("noEnoughCowDung", new Emitter.Listener()
+
+        {
+            @Override
+            public void call(Object... args) {
+                ToastUtil.showToast(getMainActivity(), "开始游戏需要至少" + (int) args[0] + "个牛粪");
+            }
+        });
+        socket.on("enterRoom", new Emitter.Listener()
+
+        {
+            @Override
+            public void call(Object... args) {
+                try {
+                    JSONArray params = (JSONArray) args[0];
+                    int userId = (int) params.get(0);
+                    String nickName = (String) params.get(1);
+                    Player player = userId == loggedInUser.getId() ? playerA : playerB;
+                    player.userId = userId;
+
+                    //播放开门声
+                    MediaPlayer mediaPlayer = MediaPlayer.create(getActivity(), R.raw.enterroom);// 得到声音资源
+                    mediaPlayer.start();
+
+                    appendMsg(0, "牛牛", nickName + "进来了");
+                } catch (JSONException e) {
+                    Log.e("", e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+        socket.on("propsUsed", new Emitter.Listener()
+
+        {
+            @Override
+            public void call(Object... args) {
+                int userId = (int) args[0];
+                int propsIndex = (int) args[1];
+                int currNumber = (int) args[2];
+                String nickName = (String) args[3];
+                appendMsg(0, "牛牛", nickName + "使用了道具");
+
+                // 己方使用了道具
+                if (userId == loggedInUser.getId()) {
+                    playerA.props[propsIndex] = currNumber;
+
+                    if (propsIndex == 0) { // 【加一行】
+                        liftDeadWords(playerB, playerB.wordDivHeight);
+                    } else if (propsIndex == 1) { // 【减一行】
+                        liftDeadWords(playerA, (-1) * playerA.wordDivHeight);
+                    }
+                } else { // 对方使用了道具
+                    if (propsIndex == 0) { // 【加一行】
+                        liftDeadWords(playerA, playerA.wordDivHeight);
+                    } else if (propsIndex == 1) { // 【减一行】
+                        liftDeadWords(playerB, (-1) * playerB.wordDivHeight);
+                    }
+                }
+            }
+        });
+    }
+
+    private void liftDeadWords(Player player, int delta) {
+        if (delta >= 0) {
+            player.bottomHeight += delta;
+        } else {
+            if (player.bottomHeight > 0) {
+                player.bottomHeight += delta;
+            } else if (player.deadWords.size() > 0) {
+                player.deadWords.remove(0);
+            }
+        }
+    }
+
+    private void appendMsg(int senderId /* 发送者ID，为0表示系统 */, String senderNickName, String msg) {
+
+    }
+
+    private void initGame() {
+        loggedInUser = getMainActivity().getAppContext().getLoggedInUser();
+        initSocket();
 
         ViewGroup field = (ViewGroup) getView().findViewById(R.id.myField);
         field.setMinimumHeight(playerA.playGroundHeight);
@@ -81,7 +215,7 @@ public class RussiaFragment extends MyFragment {
         btnStartGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startGame();
+                startMatch();
             }
         });
 
@@ -103,14 +237,6 @@ public class RussiaFragment extends MyFragment {
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden) {
-        if(hidden){
-            sendUserCmd("LEAVE_HALL", new Object[]{});
-        }
-        super.onHiddenChanged(hidden);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.add("关闭").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -127,8 +253,22 @@ public class RussiaFragment extends MyFragment {
 
     @Override
     public void onFragmentSwitched(MyFragment from, MyFragment to) {
-
+        if (from == this) {
+            sendUserCmd("LEAVE_HALL", new Object[]{});
+        }
     }
+
+    String gameState = "";
+    boolean isShowingResult = false;
+    String gameResultHint1 = "";
+    String gameResultHint2 = "";
+    String gameResultHint3 = "";
+    int roomId = 0;
+    List<String> msgs = new LinkedList<>();
+    boolean isExercise = false;
+    String wordSoundFile = "";
+    boolean isInviting = false; // 是否正在邀请其他用户
+    List<UserVo> idleUsers;
 
     private class Player {
         protected Player(String code) {
@@ -154,7 +294,7 @@ public class RussiaFragment extends MyFragment {
         int playGroundHeight = 400;
         int correctIndex = -1; // 正确答案序号
         String[] otherWordMeanings; // 所有备选答案的内容
-        int[] props = {0, 0}; // 每种道具的数量
+        int[] props = new int[]{0, 0}; // 每种道具的数量
         String code;
 
         TextView wordView;
@@ -179,7 +319,12 @@ public class RussiaFragment extends MyFragment {
         this.resetProps();
         this.initGameForPlayer(this.playerA);
         this.initGameForPlayer(this.playerB);
+
         this.sendUserCmd("GET_NEXT_WORD", new Object[]{this.playerA.wordIndex++, "", ""});
+    }
+
+    private void startMatch() {
+        this.sendUserCmd("START_GAME", new Object[]{});
     }
 
     private void initGameForPlayer(Player player) {
@@ -259,7 +404,6 @@ public class RussiaFragment extends MyFragment {
             Log.e("sendUserCmd", "系统异常");
         }
         socket.emit("userCmd", cmdObject);
-        ToastUtil.showToast(getMainActivity(), "send user cmd:" + cmd);
     }
 
     private void moveWord(Player player) {

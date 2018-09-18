@@ -419,16 +419,21 @@ public class Util {
         DownloadAWordTask task = new DownloadAWordTask(spell, null, soundBaseUrl, new DownloadAWordTask.Callback() {
             @Override
             public void onDownloaded(boolean succ) throws IOException {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                mediaPlayer.setDataSource(DownloadAWordTask.getPronounceFileOfWord(spell));
-                mediaPlayer.setOnCompletionListener(completionListener);
-                mediaPlayer.prepare();
-                mediaPlayer.start();
+                playLocalSound(mediaPlayer, completionListener, DownloadAWordTask.getPronounceFileOfWord(spell));
             }
         });
         task.execute((Void) null);
     }
+
+    public static void playLocalSound(MediaPlayer mediaPlayer, MediaPlayer.OnCompletionListener completionListener, String pronounceFileOfWord) throws IOException {
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        mediaPlayer.setDataSource(pronounceFileOfWord);
+        mediaPlayer.setOnCompletionListener(completionListener);
+        mediaPlayer.prepare();
+        mediaPlayer.start();
+    }
+
 
     public static SpannableString makeImageBtnSpanString(Context ctx, int imageResId, ClickableSpan clickableSpan) {
         Bitmap bitmap = BitmapFactory.decodeResource(ctx.getResources(), imageResId);
@@ -689,12 +694,7 @@ public class Util {
         DownloadAWordTask task = new DownloadAWordTask(null, sentences, fragment.getString(R.string.sound_base_url), new DownloadAWordTask.Callback() {
             @Override
             public void onDownloaded(boolean succ) throws IOException {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                mediaPlayer.setDataSource(DownloadAWordTask.getSentenceSoundFile(englishDigest));
-                mediaPlayer.setOnCompletionListener(completionListener);
-                mediaPlayer.prepare();
-                mediaPlayer.start();
+                playLocalSound(mediaPlayer, completionListener, DownloadAWordTask.getSentenceSoundFile(englishDigest));
             }
         });
         task.execute((Void) null);
