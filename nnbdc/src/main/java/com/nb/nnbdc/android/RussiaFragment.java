@@ -15,18 +15,22 @@ import android.widget.TextView;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.gson.reflect.TypeToken;
 import com.nb.nnbdc.R;
 import com.nb.nnbdc.android.util.ToastUtil;
+import com.nb.nnbdc.android.util.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import beidanci.vo.SearchWordResult;
 import beidanci.vo.UserVo;
 import beidanci.vo.WordVo;
 
@@ -39,6 +43,14 @@ public class RussiaFragment extends MyFragment {
     private String exceptRoom;
 
     UserVo loggedInUser;
+
+    /**
+     * 点击时不允许显示详情的单词（避免泄露答案）
+     */
+    String forbiddenWordForDetail;
+
+    public RussiaFragment() {
+    }
 
     public RussiaFragment(String hallName, String exceptRoom) {
         this.hallName = hallName;
@@ -177,6 +189,52 @@ public class RussiaFragment extends MyFragment {
                 }
             }
         });
+        socket.on("wordA", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (!isPlaying) {
+                    return;
+                }
+                try {
+                    JSONArray params = (JSONArray) args[0];
+                    JSONObject wordObj = (JSONObject) params.get(0);
+                    Type objectType = new TypeToken<WordVo>() {
+                    }.getType();
+                    playerA.currWord = Util.getGsonBuilder().create().fromJson(wordObj.toString(), objectType);
+                    JSONArray meanings = (JSONArray) params.get(1);
+                    playerA.otherWordMeanings[0] = meanings.get(0).toString();
+                    playerA.otherWordMeanings[1] = meanings.get(1).toString();
+
+                    // 更新界面上的单词显示
+                    getMainActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            playerA.wordView.setText(playerA.currWord.getSpell());
+                            ;
+                        }
+                    });
+
+                    // 为正确答案随机选择一个索引号（1～3）
+                    int correctIndex = (int) Math.ceil((3.0 * Math.random()));
+                    if (correctIndex == 0) {
+                        correctIndex = 1;
+                    }
+                    if (correctIndex == 4) {
+                        correctIndex = 3;
+                    }
+                    playerA.correctIndex = correctIndex;
+
+                    // 禁止显示当前下落单词的详情
+                    forbiddenWordForDetail = playerA.currWord.getSpell();
+
+                    //下载单词发音并自动发音
+                    Util.downloadPronounceAndPlay(playerA.currWord.getSpell(), null, mediaPlayer, getString(R.string.sound_base_url));
+                } catch (JSONException e) {
+                    Log.e("", e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void liftDeadWords(Player player, int delta) {
@@ -204,12 +262,15 @@ public class RussiaFragment extends MyFragment {
         field.setBackgroundColor(Color.BLUE);
         playerA.field = field;
         playerA.wordView = (TextView) getView().findViewById(R.id.myWordSpell);
+        playerA.wordView.setHeight(playerA.wordDivHeight);
+        playerA.wordView.setBackgroundColor(Color.GREEN);
 
         field = (LinearLayout) getView().findViewById(R.id.hisField);
         field.setMinimumHeight(playerB.playGroundHeight);
         field.setBackgroundColor(Color.RED);
         playerB.field = field;
         playerB.wordView = (TextView) getView().findViewById(R.id.hisWordSpell);
+        playerB.wordView.setHeight(playerB.wordDivHeight);
 
         View btnStartGame = getView().findViewById(R.id.btnStartGame);
         btnStartGame.setOnClickListener(new View.OnClickListener() {
@@ -285,15 +346,15 @@ public class RussiaFragment extends MyFragment {
         int dropSpeed = 2;
         List<WordVo> deadWords = new LinkedList<>();
         WordVo currWord;
-        int wordDivHeight = 20;
+        int wordDivHeight = 40;
         int currWordTop = 0;
-        int bottomTop = 200; // 千斤顶的顶端位置
+        int bottomTop = 400; // 千斤顶的顶端位置
         int bottomHeight = 0;
         int wordIndex = 0;
         int correctCount = 0;
         int playGroundHeight = 400;
         int correctIndex = -1; // 正确答案序号
-        String[] otherWordMeanings; // 所有备选答案的内容
+        String[] otherWordMeanings = {"", ""}; // 所有备选答案的内容
         int[] props = new int[]{0, 0}; // 每种道具的数量
         String code;
 
@@ -405,6 +466,7 @@ public class RussiaFragment extends MyFragment {
         }
         socket.emit("userCmd", cmdObject);
     }
+
 
     private void moveWord(Player player) {
         if (player.currWord == null) {
