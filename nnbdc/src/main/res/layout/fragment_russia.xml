@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <!--玩家A-->
         <RelativeLayout
             android:id="@+id/myField"
             android:layout_width="wrap_content"
@@ -17,15 +18,37 @@
             android:background="@drawable/field"
             android:orientation="vertical">
 
+            <!--下落中的单词-->
             <TextView
                 android:id="@+id/myWordSpell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="哈哈嘻嘻"
                 android:textColor="@color/currentWord"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:layout_centerInParent="true"/>
+
+            <!--底部死亡单词区-->
+            <LinearLayout
+                android:id="@+id/myDeadWordsArea"
+                android:layout_above="@+id/myJacksArea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"></LinearLayout>
+
+            <!--底部千斤顶-->
+            <LinearLayout
+                android:id="@+id/myJacksArea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"><TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="test"/></LinearLayout>
         </RelativeLayout>
 
+        <!--玩家B-->
         <LinearLayout
             android:id="@+id/hisField"
             android:layout_width="wrap_content"
@@ -34,6 +57,7 @@
             android:layout_weight="1"
             android:background="@drawable/field"
             android:orientation="vertical">
+            <!--下落中的单词-->
             <TextView
                 android:id="@+id/hisWordSpell"
                 android:layout_width="wrap_content"
@@ -41,6 +65,22 @@
                 android:text="哈哈"
                 android:textColor="@color/currentWord"
                 android:textSize="16sp" />
+
+            <!--底部死亡单词区-->
+            <LinearLayout
+                android:id="@+id/hisDeadWordsArea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/hisJacksArea"
+                android:orientation="vertical"></LinearLayout>
+
+            <!--底部千斤顶-->
+            <LinearLayout
+                android:id="@+id/hisJacksArea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:orientation="vertical"></LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

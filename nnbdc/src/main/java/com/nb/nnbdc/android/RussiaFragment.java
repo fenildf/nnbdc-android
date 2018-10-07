@@ -129,17 +129,13 @@ public class RussiaFragment extends MyFragment {
                 }
             }
         });
-        socket.on("noEnoughCowDung", new Emitter.Listener()
-
-        {
+        socket.on("noEnoughCowDung", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 ToastUtil.showToast(getMainActivity(), "开始游戏需要至少" + (int) args[0] + "个牛粪");
             }
         });
-        socket.on("enterRoom", new Emitter.Listener()
-
-        {
+        socket.on("enterRoom", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 try {
@@ -150,8 +146,10 @@ public class RussiaFragment extends MyFragment {
                     player.userId = userId;
 
                     //播放开门声
-                    MediaPlayer mediaPlayer = MediaPlayer.create(getActivity(), R.raw.enterroom);// 得到声音资源
-                    mediaPlayer.start();
+                    if (getMainActivity() != null) {
+                        MediaPlayer mediaPlayer = MediaPlayer.create(getMainActivity(), R.raw.enterroom);// 得到声音资源
+                        mediaPlayer.start();
+                    }
 
                     appendMsg(0, "牛牛", nickName + "进来了");
                 } catch (JSONException e) {
@@ -210,7 +208,6 @@ public class RussiaFragment extends MyFragment {
                         @Override
                         public void run() {
                             playerA.wordView.setText(playerA.currWord.getSpell());
-                            ;
                         }
                     });
 
@@ -258,18 +255,22 @@ public class RussiaFragment extends MyFragment {
         initSocket();
 
         ViewGroup field = (ViewGroup) getView().findViewById(R.id.myField);
-        field.setMinimumHeight(playerA.playGroundHeight);
+        field.getLayoutParams().height=playerA.playGroundHeight;
         field.setBackgroundColor(Color.BLUE);
         playerA.field = field;
         playerA.wordView = (TextView) getView().findViewById(R.id.myWordSpell);
+        playerA.deadWordsArea = (ViewGroup) getView().findViewById(R.id.myDeadWordsArea);
+        playerA.jacksArea = (ViewGroup) getView().findViewById(R.id.myJacksArea);
         playerA.wordView.setHeight(playerA.wordDivHeight);
         playerA.wordView.setBackgroundColor(Color.GREEN);
 
         field = (LinearLayout) getView().findViewById(R.id.hisField);
-        field.setMinimumHeight(playerB.playGroundHeight);
+        field.getLayoutParams().height=playerB.playGroundHeight;
         field.setBackgroundColor(Color.RED);
         playerB.field = field;
         playerB.wordView = (TextView) getView().findViewById(R.id.hisWordSpell);
+        playerB.deadWordsArea = (ViewGroup) getView().findViewById(R.id.hisDeadWordsArea);
+        playerB.jacksArea = (ViewGroup) getView().findViewById(R.id.hisJacksArea);
         playerB.wordView.setHeight(playerB.wordDivHeight);
 
         View btnStartGame = getView().findViewById(R.id.btnStartGame);
@@ -358,8 +359,10 @@ public class RussiaFragment extends MyFragment {
         int[] props = new int[]{0, 0}; // 每种道具的数量
         String code;
 
-        TextView wordView;
         ViewGroup field;
+        TextView wordView;
+        ViewGroup deadWordsArea;
+        ViewGroup jacksArea;
     }
 
     private Timer timer;
@@ -414,6 +417,24 @@ public class RussiaFragment extends MyFragment {
     private void dropWord2Bottom(Player player) {
         player.deadWords.add(player.currWord);
         player.currWordTop = 0;
+
+        drawDeadWords(player, "add");
+    }
+
+    /**
+     * 在底部绘制出死亡的单词
+     */
+    private void drawDeadWords(final Player player, final String operation) {
+        getMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (WordVo deadWord : player.deadWords) {
+                    TextView textView = new TextView(getMainActivity());
+                    textView.setText(deadWord.getSpell());
+                    player.deadWordsArea.addView(textView);
+                }
+            }
+        });
     }
 
     private void sendGameOverCmd(Player player) {
@@ -435,6 +456,9 @@ public class RussiaFragment extends MyFragment {
     }
 
     private UserVo getUser() {
+        if (getMainActivity() == null) {
+            return null;
+        }
         return getMainActivity().getAppContext().getLoggedInUser();
     }
 
