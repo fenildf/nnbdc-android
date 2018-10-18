@@ -23,17 +23,18 @@
                 android:id="@+id/myWordSpell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:text="哈哈嘻嘻"
                 android:textColor="@color/currentWord"
-                android:textSize="16sp"
-                android:layout_centerInParent="true"/>
+                android:textSize="16sp" />
 
             <!--底部死亡单词区-->
             <LinearLayout
                 android:id="@+id/myDeadWordsArea"
-                android:layout_above="@+id/myJacksArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_above="@+id/myJacksArea"
+                android:background="@color/ciXing"
                 android:orientation="vertical"></LinearLayout>
 
             <!--底部千斤顶-->
@@ -41,11 +42,14 @@
                 android:id="@+id/myJacksArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_alignParentBottom="true"><TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="test"/></LinearLayout>
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
+
+                <!--<TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="test" />-->
+            </LinearLayout>
         </RelativeLayout>
 
         <!--玩家B-->

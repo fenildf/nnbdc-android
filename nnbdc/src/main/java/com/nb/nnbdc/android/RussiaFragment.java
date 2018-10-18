@@ -34,6 +34,8 @@ import beidanci.vo.SearchWordResult;
 import beidanci.vo.UserVo;
 import beidanci.vo.WordVo;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+
 
 public class RussiaFragment extends MyFragment {
     private MediaPlayer mediaPlayer = new MediaPlayer();
@@ -255,7 +257,7 @@ public class RussiaFragment extends MyFragment {
         initSocket();
 
         ViewGroup field = (ViewGroup) getView().findViewById(R.id.myField);
-        field.getLayoutParams().height=playerA.playGroundHeight;
+        field.getLayoutParams().height = playerA.playGroundHeight;
         field.setBackgroundColor(Color.BLUE);
         playerA.field = field;
         playerA.wordView = (TextView) getView().findViewById(R.id.myWordSpell);
@@ -265,7 +267,7 @@ public class RussiaFragment extends MyFragment {
         playerA.wordView.setBackgroundColor(Color.GREEN);
 
         field = (LinearLayout) getView().findViewById(R.id.hisField);
-        field.getLayoutParams().height=playerB.playGroundHeight;
+        field.getLayoutParams().height = playerB.playGroundHeight;
         field.setBackgroundColor(Color.RED);
         playerB.field = field;
         playerB.wordView = (TextView) getView().findViewById(R.id.hisWordSpell);
@@ -411,28 +413,50 @@ public class RussiaFragment extends MyFragment {
     }
 
     private int deadTopOfPlayer(Player player) {
-        return player.playGroundHeight - player.bottomHeight - player.wordDivHeight * player.deadWords.size();
+        return player.deadWordsArea.getTop();
+        //return player.playGroundHeight - player.bottomHeight - player.wordDivHeight * player.deadWords.size();
     }
 
     private void dropWord2Bottom(Player player) {
         player.deadWords.add(player.currWord);
         player.currWordTop = 0;
 
-        drawDeadWords(player, "add");
+        addDeadWord(player.currWord, player);
     }
 
     /**
-     * 在底部绘制出死亡的单词
+     * 把View Group中的底部的那个Item移动到顶部
+     *
+     * @param viewGroup
      */
-    private void drawDeadWords(final Player player, final String operation) {
+    private static void moveBottonItem2Top(ViewGroup viewGroup) {
+        if (viewGroup.getChildCount() < 2) {
+            return;
+        }
+
+        for (int k =  0; k <= viewGroup.getChildCount()-2; k++) {
+            View item = viewGroup.getChildAt(0);
+            viewGroup.removeViewAt(0);
+            viewGroup.addView(item);
+        }
+    }
+
+    private void addDeadWord(final WordVo deadWord, final Player player) {
         getMainActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for (WordVo deadWord : player.deadWords) {
-                    TextView textView = new TextView(getMainActivity());
-                    textView.setText(deadWord.getSpell());
-                    player.deadWordsArea.addView(textView);
-                }
+                TextView textView = new TextView(getMainActivity());
+                textView.setText(deadWord.getSpell());
+                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                textView.setLayoutParams(layoutParams);
+                textView.setTextColor(Color.RED);
+                textView.setTextSize(COMPLEX_UNIT_SP, 16);
+                textView.setHeight(player.wordDivHeight);
+                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                player.deadWordsArea.addView(textView);
+
+                moveBottonItem2Top(player.deadWordsArea);
             }
         });
     }
