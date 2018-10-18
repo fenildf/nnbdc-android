@@ -1,6 +1,7 @@
 package com.nb.nnbdc.android;
 
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -127,6 +128,23 @@ public abstract class MyFragment extends Fragment implements FragmentSwitchListe
 
     protected interface InputDlgListener {
         void onInput(String content);
+    }
+
+    /**
+     * 保持到main activity的引用，防止main activity被自动回收
+     */
+    private Activity mainActivity;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mainActivity = activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mainActivity = null;
     }
 
     @Override

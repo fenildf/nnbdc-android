@@ -11,10 +11,10 @@
         <!--玩家A-->
         <RelativeLayout
             android:id="@+id/myField"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="4dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:background="@drawable/field"
             android:orientation="vertical">
 
@@ -53,12 +53,12 @@
         </RelativeLayout>
 
         <!--玩家B-->
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/hisField"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:background="@drawable/field"
             android:orientation="vertical">
             <!--下落中的单词-->
@@ -66,6 +66,7 @@
                 android:id="@+id/hisWordSpell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:text="哈哈"
                 android:textColor="@color/currentWord"
                 android:textSize="16sp" />
@@ -83,9 +84,9 @@
                 android:id="@+id/hisJacksArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
+                android:layout_alignParentBottom="true"
                 android:orientation="vertical"></LinearLayout>
-        </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 
     <Button

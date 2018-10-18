@@ -234,6 +234,42 @@ public class RussiaFragment extends MyFragment {
                 }
             }
         });
+        socket.on("wordB", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (!isPlaying) {
+                    return;
+                }
+                if (isExercise) {
+                    return;
+                }
+                try {
+                    JSONArray params = (JSONArray) args[0];
+                    String answerResult = (String) params.get(0);
+
+                    if (answerResult.equals("true")) {
+                        playerB.currWordTop = 0;
+                    } else if (answerResult.equals("false")){
+                        dropWord2Bottom(playerB);
+                    }
+
+                    String spell = (String) params.get(1);
+                    WordVo word = new WordVo(spell);
+                    playerB.currWord = word;
+
+                    // 更新界面上的单词显示
+                    getMainActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            playerB.wordView.setText(playerB.currWord.getSpell());
+                        }
+                    });
+                } catch (JSONException e) {
+                    Log.e("", e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void liftDeadWords(Player player, int delta) {
@@ -258,17 +294,14 @@ public class RussiaFragment extends MyFragment {
 
         ViewGroup field = (ViewGroup) getView().findViewById(R.id.myField);
         field.getLayoutParams().height = playerA.playGroundHeight;
-        field.setBackgroundColor(Color.BLUE);
         playerA.field = field;
         playerA.wordView = (TextView) getView().findViewById(R.id.myWordSpell);
         playerA.deadWordsArea = (ViewGroup) getView().findViewById(R.id.myDeadWordsArea);
         playerA.jacksArea = (ViewGroup) getView().findViewById(R.id.myJacksArea);
         playerA.wordView.setHeight(playerA.wordDivHeight);
-        playerA.wordView.setBackgroundColor(Color.GREEN);
 
-        field = (LinearLayout) getView().findViewById(R.id.hisField);
+        field = (ViewGroup) getView().findViewById(R.id.hisField);
         field.getLayoutParams().height = playerB.playGroundHeight;
-        field.setBackgroundColor(Color.RED);
         playerB.field = field;
         playerB.wordView = (TextView) getView().findViewById(R.id.hisWordSpell);
         playerB.deadWordsArea = (ViewGroup) getView().findViewById(R.id.hisDeadWordsArea);
@@ -434,7 +467,7 @@ public class RussiaFragment extends MyFragment {
             return;
         }
 
-        for (int k =  0; k <= viewGroup.getChildCount()-2; k++) {
+        for (int k = 0; k <= viewGroup.getChildCount() - 2; k++) {
             View item = viewGroup.getChildAt(0);
             viewGroup.removeViewAt(0);
             viewGroup.addView(item);
