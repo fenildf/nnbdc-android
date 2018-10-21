@@ -118,7 +118,7 @@ public class RussiaFragment extends MyFragment {
                     public void call(Object... args) {
                         int userId = (int) args[0];
                         if (userId == playerA.userId) {
-                             playerA.started = true;
+                            playerA.started = true;
                         } else {
                             playerB.started = true;
                         }
@@ -287,7 +287,7 @@ public class RussiaFragment extends MyFragment {
                             if (answerResult.equals("true")) {
                                 playerB.currWordTop = 0;
                             } else if (answerResult.equals("false")) {
-                                dropWord2Bottom(playerB);
+                                dropWord2Bottom(playerB, false);
                             }
 
                             String spell = (String) params.get(1);
@@ -326,7 +326,7 @@ public class RussiaFragment extends MyFragment {
                         }, 4000);
 
                         Integer loserId = (Integer) args[0];
-                        if (loserId == loggedInUser.getId()) {
+                        if (loserId.equals(loggedInUser.getId())) {
                             if (isExercise) {
                                 isExercise = false;
                                 gameResultHint1 = "游戏结束！";
@@ -341,6 +341,7 @@ public class RussiaFragment extends MyFragment {
                         } else {
                             gameResultHint1 = "胜利啦！";
                             gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
+                            dropWord2Bottom(playerB, true);
                             playSound(R.raw.victory);
                         }
 
@@ -398,7 +399,7 @@ public class RussiaFragment extends MyFragment {
                         } else {
                             if (player.jacksArea.getLayoutParams().height > 0) {
                                 player.jacksArea.getLayoutParams().height += delta;
-                            } else if (player.deadWords.size() > 0) {
+                            } else if (player.deadWordsArea.getChildCount() > 0) {
                                 removeDeadWordAtBottom(player);
                             }
                         }
@@ -564,7 +565,7 @@ public class RussiaFragment extends MyFragment {
         if (propsType == 0) { // 加一行
             sendUserCmd("USE_PROPS", new Object[]{propsType});
         } else { // 减一行
-            if (playerA.jacksArea.getLayoutParams().height > 0 || playerA.deadWords.size() > 0) { // 避免浪费道具
+            if (playerA.jacksArea.getLayoutParams().height > 0 || playerA.deadWordsArea.getChildCount() > 0) { // 避免浪费道具
                 sendUserCmd("USE_PROPS", new Object[]{propsType});
             }
         }
@@ -594,7 +595,7 @@ public class RussiaFragment extends MyFragment {
             playerA.currWordTop = 0;
             sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "true", playerA.currWord.getSpell()});
         } else { // 选错了
-            dropWord2Bottom(this.playerA);
+            dropWord2Bottom(this.playerA, false);
             sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "false", playerA.currWord.getSpell()});
         }
         playerA.currWord = null;
@@ -656,7 +657,6 @@ public class RussiaFragment extends MyFragment {
         int winCount;
         int lostCount;
         int dropSpeed = 2;
-        List<WordVo> deadWords = new LinkedList<>();
         WordVo currWord;
         int wordDivHeight = 40;
         int currWordTop = 0;
@@ -670,6 +670,7 @@ public class RussiaFragment extends MyFragment {
 
         ViewGroup field;
         TextView wordView;
+        List<WordVo> deadWords = new LinkedList<>(); // 死亡单词（注意，当使用【减一行】道具时，相应的死亡单词并不会删除，而仅仅是在界面上删除）
         ViewGroup deadWordsArea;
         View jacksArea;
     }
@@ -705,7 +706,7 @@ public class RussiaFragment extends MyFragment {
         player.wordIndex = 0;
         player.correctCount = 0;
         player.currWordTop = 0;
-        player.jacksArea.getLayoutParams().height=0;
+        player.jacksArea.getLayoutParams().height = 0;
         player.started = false;
     }
 
@@ -716,6 +717,7 @@ public class RussiaFragment extends MyFragment {
         for (int i = 0; i < playerA.props.length; i++) {
             playerA.props[i] = 0;
         }
+        renderProps();
     }
 
     private int deadTopOfPlayer(Player player) {
@@ -723,9 +725,10 @@ public class RussiaFragment extends MyFragment {
         //return player.playGroundHeight - player.bottomHeight - player.wordDivHeight * player.deadWords.size();
     }
 
-    private void dropWord2Bottom(final Player player) {
+    private void dropWord2Bottom(final Player player, final boolean clearDroppingWord) {
         player.deadWords.add(player.currWord);
         player.currWordTop = 0;
+        final WordVo deadWord = player.currWord;
 
         getAvailableActivity(new IActivityEnabledListener() {
             @Override
@@ -733,8 +736,10 @@ public class RussiaFragment extends MyFragment {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        addDeadWord(player.currWord, player);
-                        player.wordView.setText("");
+                        addDeadWord(deadWord, player);
+                        if (clearDroppingWord) {
+                            player.wordView.setText("");
+                        }
                     }
                 });
             }
@@ -886,7 +891,7 @@ public class RussiaFragment extends MyFragment {
         if (wordBottom >= this.deadTopOfPlayer(player)) {
             if (player == this.playerA) {
                 // 触到底部则单词死亡
-                dropWord2Bottom(player);
+                dropWord2Bottom(player, false);
 
                 // 达到顶部则游戏结束(己方窗口达到顶部)
                 if (isPlayGroundFull(player)) {
