@@ -3,9 +3,11 @@ package com.nb.nnbdc.android;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.ViewGroup;
@@ -130,23 +132,6 @@ public abstract class MyFragment extends Fragment implements FragmentSwitchListe
         void onInput(String content);
     }
 
-    /**
-     * 保持到main activity的引用，防止main activity被自动回收
-     */
-    private Activity mainActivity;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mainActivity = activity;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mainActivity = null;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,5 +142,40 @@ public abstract class MyFragment extends Fragment implements FragmentSwitchListe
     public void onDestroy() {
         getMainActivity().unRegisterFragmentSwitchListener(this);
         super.onDestroy();
+    }
+
+    protected IActivityEnabledListener aeListener;
+
+    protected interface IActivityEnabledListener{
+        void onActivityEnabled(MainActivity activity);
+    }
+
+    protected void getAvailableActivity(IActivityEnabledListener listener){
+        if (getActivity() == null){
+            aeListener = listener;
+
+        } else {
+            listener.onActivityEnabled((MainActivity)getActivity());
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        if (aeListener != null){
+            aeListener.onActivityEnabled((MainActivity) activity);
+            aeListener = null;
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (aeListener != null){
+            aeListener.onActivityEnabled((MainActivity) context);
+            aeListener = null;
+        }
     }
 }

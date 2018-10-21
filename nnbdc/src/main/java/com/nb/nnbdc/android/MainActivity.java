@@ -150,7 +150,7 @@ public class MainActivity extends MyActivity {
         }
         rawWordFragment = new RawWordFragment();
         fTransaction.add(R.id.main_content, rawWordFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = rawWordFragment;
 
         setTitle("生词本");
@@ -169,7 +169,7 @@ public class MainActivity extends MyActivity {
         }
         meFragment = new MeFragment();
         fTransaction.add(R.id.main_content, meFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = meFragment;
 
         setTitle("我的学习进度");
@@ -188,7 +188,7 @@ public class MainActivity extends MyActivity {
         }
         selectBookFragment = new SelectBookFragment();
         fTransaction.add(R.id.main_content, selectBookFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = selectBookFragment;
 
         setTitle("单词书");
@@ -206,7 +206,7 @@ public class MainActivity extends MyActivity {
         } else {
             fTransaction.show(searchFragment);
         }
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = searchFragment;
 
         setTitle("查找单词");
@@ -225,7 +225,7 @@ public class MainActivity extends MyActivity {
         }
         gameCenterFragment = new GameCenterFragment();
         fTransaction.add(R.id.main_content, gameCenterFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = gameCenterFragment;
 
         setTitle("游戏大厅");
@@ -244,7 +244,7 @@ public class MainActivity extends MyActivity {
         }
         russiaFragment = new RussiaFragment(hallName, exceptRoom);
         fTransaction.add(R.id.main_content, russiaFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = russiaFragment;
 
         setTitle("游戏");
@@ -263,7 +263,7 @@ public class MainActivity extends MyActivity {
         }
         beforeBdcFragment = new BeforeBdcFragment();
         fTransaction.add(R.id.main_content, beforeBdcFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = beforeBdcFragment;
 
         setTitle("今日学习计划");
@@ -288,7 +288,7 @@ public class MainActivity extends MyActivity {
         } else {
             fTransaction.show(bdcFragment);
         }
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = bdcFragment;
 
         setTitle("背单词");
@@ -307,7 +307,7 @@ public class MainActivity extends MyActivity {
         }
         finishFragment = new FinishFragment();
         fTransaction.add(R.id.main_content, finishFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = finishFragment;
 
         setTitle("今日学习已完成");
@@ -326,7 +326,7 @@ public class MainActivity extends MyActivity {
         }
         stageReviewFragment = new StageReviewFragment();
         fTransaction.add(R.id.main_content, stageReviewFragment);
-        fTransaction.commitAllowingStateLoss();
+        fTransaction.commit();
         currentFragment = stageReviewFragment;
 
         setTitle("阶段复习");

@@ -3,6 +3,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--play ground-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,22 +35,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/myJacksArea"
-                android:background="@color/ciXing"
                 android:orientation="vertical"></LinearLayout>
 
             <!--底部千斤顶-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/myJacksArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:orientation="vertical">
-
-                <!--<TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="test" />-->
-            </LinearLayout>
+                android:height="0dp"
+                android:background="#f00"></TextView>
         </RelativeLayout>
 
         <!--玩家B-->
@@ -80,20 +75,162 @@
                 android:orientation="vertical"></LinearLayout>
 
             <!--底部千斤顶-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/hisJacksArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:orientation="vertical"></LinearLayout>
+                android:height="0dp"
+                android:background="#f00"></TextView>
         </RelativeLayout>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnStartGame"
-        android:layout_width="80dp"
-        android:layout_height="fill_parent"
-        android:background="@color/colorPrimaryDark"
-        android:src="@drawable/search"
-        android:text="开始" />
+    <!--道具区-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/inc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:background="#00000000"
+                android:src="@drawable/plus" />
+
+            <TextView
+                android:id="@+id/plus_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginRight="8dp"
+                android:text="0"
+                android:textColor="#ddd"
+                android:textSize="10sp" />
+        </FrameLayout>
+
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/dec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:background="#00000000"
+                android:src="@drawable/minus" />
+
+            <TextView
+                android:id="@+id/minus_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginRight="8dp"
+                android:text="0"
+                android:textColor="#ddd"
+                android:textSize="10sp" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!--控制按钮区-->
+    <LinearLayout
+        android:id="@+id/controlBtns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btnStartGame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="开始比赛"
+            android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/btnInvite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="邀请对手"
+            android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/btnChangeRoom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="换房间"
+            android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/btnExercise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="单人练习"
+            android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/btnExit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="离开"
+            android:textColor="@color/defaultTextColor" />
+    </LinearLayout>
+
+    <!--备选答案按钮区-->
+    <LinearLayout
+        android:id="@+id/answerBtns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btn1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="answer1"
+            android:textAllCaps="false"
+            android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/btn2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="answer2"
+            android:textAllCaps="false"
+            android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/btn3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="answer3"
+            android:textAllCaps="false"
+            android:textColor="@color/defaultTextColor" />
+    </LinearLayout>
+
 </LinearLayout>
