@@ -336,7 +336,7 @@ public class Util {
         return spannable;
     }
 
-    public static void saveLoggedInUserToCache(UserVo user, Context context){
+    public static void saveLoggedInUserToCache(UserVo user, Context context) {
         SharedPreferences settings = context.getSharedPreferences("loggedInUser", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("json", Util.toJson(user));
@@ -346,7 +346,7 @@ public class Util {
 
     public static UserVo getCachedLoggedInUser(Context context) throws JSONException {
         SharedPreferences settings = context.getSharedPreferences("loggedInUser", Activity.MODE_PRIVATE);
-        UserVo user =  Util.getGsonBuilder().create().fromJson(settings.getString("json", null), UserVo.class);
+        UserVo user = Util.getGsonBuilder().create().fromJson(settings.getString("json", null), UserVo.class);
         return user;
     }
 
@@ -434,6 +434,21 @@ public class Util {
         mediaPlayer.start();
     }
 
+    public static void playSoundByResId(final int soundId, final Activity activity) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaPlayer mediaPlayer = MediaPlayer.create(activity, soundId);// 得到声音资源
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        mediaPlayer.release();
+                    }
+                });
+                mediaPlayer.start();
+            }
+        });
+    }
 
     public static SpannableString makeImageBtnSpanString(Context ctx, int imageResId, ClickableSpan clickableSpan) {
         Bitmap bitmap = BitmapFactory.decodeResource(ctx.getResources(), imageResId);

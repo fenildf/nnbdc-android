@@ -235,7 +235,7 @@ public class MainActivity extends MyActivity {
         fireFragmentSwitchEvent(from, currentFragment);
     }
 
-    public void switchToRussiaFragment(MyFragment from, String hallName, String exceptRoom) {
+    public void switchToRussiaFragment(MyFragment from, String hallName, Integer exceptRoom) {
         bottomMenu.setVisibility(View.VISIBLE);
         FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
         hideAllFragment(fTransaction);

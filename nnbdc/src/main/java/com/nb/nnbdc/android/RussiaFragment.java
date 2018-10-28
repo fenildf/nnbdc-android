@@ -43,7 +43,7 @@ public class RussiaFragment extends MyFragment {
 
     private Socket socket;
     private String hallName;
-    private String exceptRoom;
+    private Integer exceptRoom;
 
     UserVo loggedInUser;
 
@@ -57,7 +57,7 @@ public class RussiaFragment extends MyFragment {
     public RussiaFragment() {
     }
 
-    public RussiaFragment(String hallName, String exceptRoom) {
+    public RussiaFragment(String hallName, Integer exceptRoom) {
         this.hallName = hallName;
         this.exceptRoom = exceptRoom;
     }
@@ -90,67 +90,92 @@ public class RussiaFragment extends MyFragment {
                 socket.off("sysCmd");
                 socket.on("sysCmd", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        String cmd = (String) args[0];
-                        if (cmd.equals("BEGIN_EXERCISE")) {
-                            isExercise = true;
-                            startGame();
-                            appendMsg(0, "牛牛", "练习开始");
-                        } else if (cmd.equals("BEGIN")) {
-                            isExercise = false;
-                            startGame();
-                            appendMsg(0, "牛牛", "比赛开始");
-                        } else {
-                            Log.e("", "不支持的命令： " + cmd);
-                        }
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String cmd = (String) args[0];
+                                if (cmd.equals("BEGIN_EXERCISE")) {
+                                    isExercise = true;
+                                    startGame();
+                                    appendMsg(0, "牛牛", "练习开始");
+                                } else if (cmd.equals("BEGIN")) {
+                                    isExercise = false;
+                                    startGame();
+                                    appendMsg(0, "牛牛", "比赛开始");
+                                } else {
+                                    Log.e("", "不支持的命令： " + cmd);
+                                }
+                            }
+                        });
                     }
                 });
                 socket.off("idleUsers");
                 socket.on("idleUsers", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        idleUsers = (List<UserVo>) args[0];
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                idleUsers = (List<UserVo>) args[0];
+                            }
+                        });
                     }
                 });
                 socket.off("userStarted");
                 socket.on("userStarted", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        int userId = (int) args[0];
-                        if (userId == playerA.userId) {
-                            playerA.started = true;
-                        } else {
-                            playerB.started = true;
-                        }
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                int userId = (int) args[0];
+                                if (userId == playerA.userId) {
+                                    playerA.started = true;
+                                } else {
+                                    playerB.started = true;
+                                }
+                            }
+                        });
                     }
                 });
                 socket.off("giveProps");
                 socket.on("giveProps", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        if (!isExercise) {
-                            try {
-                                JSONArray params = (JSONArray) args[0];
-                                int propsIndex = (Integer) params.get(0);
-                                int propsCount = (int) params.get(1);
-                                playerA.props[propsIndex] = propsCount;
-                                renderProps();
-                            } catch (JSONException e) {
-                                Log.e("", e.getMessage());
-                                e.printStackTrace();
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!isExercise) {
+                                    try {
+                                        JSONArray params = (JSONArray) args[0];
+                                        int propsIndex = (Integer) params.get(0);
+                                        int propsCount = (int) params.get(1);
+                                        playerA.props[propsIndex] = propsCount;
+                                        renderProps();
+                                    } catch (JSONException e) {
+                                        Log.e("", e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
-                        }
+                        });
                     }
                 });
                 socket.off("noEnoughCowDung");
                 socket.on("noEnoughCowDung", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        final int minCount = (int) args[0];
-                        getAvailableActivity(new IActivityEnabledListener() {
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
                             @Override
-                            public void onActivityEnabled(MainActivity activity) {
-                                ToastUtil.showToast(activity, "开始游戏需要至少" + minCount + "个牛粪");
+                            public void run() {
+                                final int minCount = (int) args[0];
+                                getAvailableActivity(new IActivityEnabledListener() {
+                                    @Override
+                                    public void onActivityEnabled(MainActivity activity) {
+                                        ToastUtil.showToast(activity, "开始游戏需要至少" + minCount + "个牛粪");
+                                    }
+                                });
                             }
                         });
                     }
@@ -158,198 +183,230 @@ public class RussiaFragment extends MyFragment {
                 socket.off("enterRoom");
                 socket.on("enterRoom", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        try {
-                            JSONArray params = (JSONArray) args[0];
-                            int userId = (int) params.get(0);
-                            String nickName = (String) params.get(1);
-                            Player player = userId == loggedInUser.getId() ? playerA : playerB;
-                            player.userId = userId;
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    JSONArray params = (JSONArray) args[0];
+                                    int userId = (int) params.get(0);
+                                    String nickName = (String) params.get(1);
+                                    Player player = userId == loggedInUser.getId() ? playerA : playerB;
+                                    player.userId = userId;
 
-                            //播放开门声
-                            playSound(R.raw.enterroom);
+                                    //播放开门声
+                                    playSound(R.raw.enterroom);
 
-                            appendMsg(0, "牛牛", nickName + "进来了");
-                        } catch (JSONException e) {
-                            Log.e("", e.getMessage());
-                            e.printStackTrace();
-                        }
+                                    appendMsg(0, "牛牛", nickName + "进来了");
+                                } catch (JSONException e) {
+                                    Log.e("", e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
                 });
                 socket.off("propsUsed");
-                socket.on("propsUsed", new Emitter.Listener()
-
-                {
+                socket.on("propsUsed", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        try {
-                            JSONArray params = (JSONArray) args[0];
-                            int userId = (int) params.get(0);
-                            int propsIndex = (int) params.get(1);
-                            int currNumber = (int) params.get(2);
-                            String nickName = (String) params.get(3);
-                            appendMsg(0, "牛牛", nickName + "使用了道具");
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    JSONArray params = (JSONArray) args[0];
+                                    int userId = (int) params.get(0);
+                                    int propsIndex = (int) params.get(1);
+                                    int currNumber = (int) params.get(2);
+                                    String nickName = (String) params.get(3);
+                                    appendMsg(0, "牛牛", nickName + "使用了道具");
 
-                            // 己方使用了道具
-                            if (userId == loggedInUser.getId()) {
-                                playerA.props[propsIndex] = currNumber;
+                                    // 己方使用了道具
+                                    if (userId == loggedInUser.getId()) {
+                                        playerA.props[propsIndex] = currNumber;
 
-                                if (propsIndex == 0) { // 【加一行】
-                                    liftDeadWords(playerB, playerB.wordDivHeight);
-                                } else if (propsIndex == 1) { // 【减一行】
-                                    liftDeadWords(playerA, (-1) * playerA.wordDivHeight);
-                                }
-                            } else { // 对方使用了道具
-                                if (propsIndex == 0) { // 【加一行】
-                                    liftDeadWords(playerA, playerA.wordDivHeight);
-                                } else if (propsIndex == 1) { // 【减一行】
-                                    liftDeadWords(playerB, (-1) * playerB.wordDivHeight);
+                                        if (propsIndex == 0) { // 【加一行】
+                                            liftDeadWords(playerB, playerB.wordDivHeight);
+                                        } else if (propsIndex == 1) { // 【减一行】
+                                            liftDeadWords(playerA, (-1) * playerA.wordDivHeight);
+                                        }
+                                    } else { // 对方使用了道具
+                                        if (propsIndex == 0) { // 【加一行】
+                                            liftDeadWords(playerA, playerA.wordDivHeight);
+                                        } else if (propsIndex == 1) { // 【减一行】
+                                            liftDeadWords(playerB, (-1) * playerB.wordDivHeight);
+                                        }
+                                    }
+
+                                    renderProps();
+                                } catch (JSONException e) {
+                                    Log.e("", e.getMessage());
+                                    e.printStackTrace();
                                 }
                             }
-
-                            renderProps();
-                        } catch (JSONException e) {
-                            Log.e("", e.getMessage());
-                            e.printStackTrace();
-                        }
-
-
+                        });
+                    }
+                });
+                socket.off("roomId");
+                socket.on("roomId", new Emitter.Listener() {
+                    @Override
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                roomId = (int) args[0];
+                            }
+                        });
                     }
                 });
                 socket.off("wordA");
                 socket.on("wordA", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        if (!isPlaying) {
-                            return;
-                        }
-                        try {
-                            JSONArray params = (JSONArray) args[0];
-                            JSONObject wordObj = (JSONObject) params.get(0);
-                            Type objectType = new TypeToken<WordVo>() {
-                            }.getType();
-                            playerA.currWord = Util.getGsonBuilder().create().fromJson(wordObj.toString(), objectType);
-                            JSONArray meanings = (JSONArray) params.get(1);
-                            playerA.otherWordMeanings[0] = meanings.get(0).toString();
-                            playerA.otherWordMeanings[1] = meanings.get(1).toString();
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!isPlaying) {
+                                    return;
+                                }
+                                try {
+                                    JSONArray params = (JSONArray) args[0];
+                                    JSONObject wordObj = (JSONObject) params.get(0);
+                                    Type objectType = new TypeToken<WordVo>() {
+                                    }.getType();
+                                    playerA.currWord = Util.getGsonBuilder().create().fromJson(wordObj.toString(), objectType);
+                                    JSONArray meanings = (JSONArray) params.get(1);
+                                    playerA.otherWordMeanings[0] = meanings.get(0).toString();
+                                    playerA.otherWordMeanings[1] = meanings.get(1).toString();
 
 
-                            // 为正确答案随机选择一个索引号（1～3）
-                            int correctIndex = (int) Math.ceil((3.0 * Math.random()));
-                            if (correctIndex == 0) {
-                                correctIndex = 1;
-                            }
-                            if (correctIndex == 4) {
-                                correctIndex = 3;
-                            }
-                            playerA.correctIndex = correctIndex;
+                                    // 为正确答案随机选择一个索引号（1～3）
+                                    int correctIndex = (int) Math.ceil((3.0 * Math.random()));
+                                    if (correctIndex == 0) {
+                                        correctIndex = 1;
+                                    }
+                                    if (correctIndex == 4) {
+                                        correctIndex = 3;
+                                    }
+                                    playerA.correctIndex = correctIndex;
 
-                            // 禁止显示当前下落单词的详情
-                            forbiddenWordForDetail = playerA.currWord.getSpell();
+                                    // 禁止显示当前下落单词的详情
+                                    forbiddenWordForDetail = playerA.currWord.getSpell();
 
-                            // 更新界面上的单词显示
-                            getAvailableActivity(new IActivityEnabledListener() {
-                                @Override
-                                public void onActivityEnabled(MainActivity activity) {
-                                    activity.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            renderPlayerAWord();
-                                            updateUI();
-                                        }
-                                    });
+                                    // 更新界面上的单词显示
+                                    renderPlayerAWord();
+                                    updateUI();
 
                                     //下载单词发音并自动发音
                                     Util.downloadPronounceAndPlay(playerA.currWord.getSpell(), null, mediaPlayer, getString(R.string.sound_base_url));
-                                }
-                            });
 
-                        } catch (JSONException e) {
-                            Log.e("", e.getMessage());
-                            e.printStackTrace();
-                        }
+                                } catch (JSONException e) {
+                                    Log.e("", e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
                 });
                 socket.off("wordB");
                 socket.on("wordB", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        if (!isPlaying) {
-                            return;
-                        }
-                        if (isExercise) {
-                            return;
-                        }
-                        try {
-                            JSONArray params = (JSONArray) args[0];
-                            String answerResult = (String) params.get(0);
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!isPlaying) {
+                                    return;
+                                }
+                                if (isExercise) {
+                                    return;
+                                }
+                                try {
+                                    JSONArray params = (JSONArray) args[0];
+                                    String answerResult = (String) params.get(0);
 
-                            if (answerResult.equals("true")) {
-                                playerB.currWordTop = 0;
-                            } else if (answerResult.equals("false")) {
-                                dropWord2Bottom(playerB, false);
-                            }
+                                    if (answerResult.equals("true")) {
+                                        playerB.currWordTop = 0;
+                                    } else if (answerResult.equals("false")) {
+                                        dropWord2Bottom(playerB, false);
+                                    }
 
-                            String spell = (String) params.get(1);
-                            WordVo word = new WordVo(spell);
-                            playerB.currWord = word;
+                                    String spell = (String) params.get(1);
+                                    WordVo word = new WordVo(spell);
+                                    playerB.currWord = word;
 
-                            // 更新界面上的单词显示
-                            getAvailableActivity(new IActivityEnabledListener() {
-                                @Override
-                                public void onActivityEnabled(MainActivity activity) {
-                                    activity.runOnUiThread(new Runnable() {
+                                    // 更新界面上的单词显示
+                                    getAvailableActivity(new IActivityEnabledListener() {
                                         @Override
-                                        public void run() {
-                                            playerB.wordView.setText(playerB.currWord.getSpell());
+                                        public void onActivityEnabled(MainActivity activity) {
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    playerB.wordView.setText(playerB.currWord.getSpell());
+                                                }
+                                            });
                                         }
                                     });
+                                } catch (JSONException e) {
+                                    Log.e("", e.getMessage());
+                                    e.printStackTrace();
                                 }
-                            });
-                        } catch (JSONException e) {
-                            Log.e("", e.getMessage());
-                            e.printStackTrace();
-                        }
+                            }
+                        });
                     }
                 });
                 socket.off("loser");
                 socket.on("loser", new Emitter.Listener() {
                     @Override
-                    public void call(Object... args) {
-                        isPlaying = false;
-                        isShowingResult = true;
-                        timer.schedule(new TimerTask() {
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                isShowingResult = false;
+                                isPlaying = false;
+                                isShowingResult = true;
+                                timer.schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        isShowingResult = false;
+                                    }
+                                }, 4000);
+
+                                Integer loserId = (Integer) args[0];
+                                if (loserId.equals(loggedInUser.getId())) {
+                                    if (isExercise) {
+                                        isExercise = false;
+                                        gameResultHint1 = "游戏结束！";
+                                        gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
+                                    } else {
+                                        gameResultHint1 = "失败了，别灰心，继续努力！";
+                                        gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
+                                    }
+
+                                    playSound(R.raw.failed);
+
+                                } else {
+                                    gameResultHint1 = "胜利啦！";
+                                    gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
+                                    dropWord2Bottom(playerB, true);
+                                    playSound(R.raw.victory);
+                                }
+
+                                // 游戏已经分出胜负，允许查询单词的意思了
+                                forbiddenPopupDetailForAllWords = false;
+                                forbiddenWordForDetail = "";
                             }
-                        }, 4000);
-
-                        Integer loserId = (Integer) args[0];
-                        if (loserId.equals(loggedInUser.getId())) {
-                            if (isExercise) {
-                                isExercise = false;
-                                gameResultHint1 = "游戏结束！";
-                                gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
-                            } else {
-                                gameResultHint1 = "失败了，别灰心，继续努力！";
-                                gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
-                            }
-
-                            playSound(R.raw.failed);
-
-                        } else {
-                            gameResultHint1 = "胜利啦！";
-                            gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
-                            dropWord2Bottom(playerB, true);
-                            playSound(R.raw.victory);
-                        }
-
-                        // 游戏已经分出胜负，允许查询单词的意思了
-                        forbiddenPopupDetailForAllWords = false;
-                        forbiddenWordForDetail = "";
+                        });
                     }
                 });
+            }
+        });
+    }
+
+    private void runOnUiThread(final Runnable runnable) {
+        getAvailableActivity(new IActivityEnabledListener() {
+            @Override
+            public void onActivityEnabled(MainActivity activity) {
+                activity.runOnUiThread(runnable);
             }
         });
     }
@@ -376,8 +433,7 @@ public class RussiaFragment extends MyFragment {
         getAvailableActivity(new IActivityEnabledListener() {
             @Override
             public void onActivityEnabled(MainActivity activity) {
-                MediaPlayer mediaPlayer = MediaPlayer.create(activity, soundId);// 得到声音资源
-                mediaPlayer.start();
+                Util.playSoundByResId(soundId, activity);
             }
         });
     }
@@ -439,30 +495,56 @@ public class RussiaFragment extends MyFragment {
      * 显示/隐藏 控制按钮
      */
     private void updateUI() {
-        getAvailableActivity(new IActivityEnabledListener() {
+        runOnUiThread(new Runnable() {
             @Override
-            public void onActivityEnabled(MainActivity activity) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (getView() == null) {
-                            return;
-                        }
-                        ViewGroup controlBtns = (ViewGroup) getView().findViewById(R.id.controlBtns);
-                        if (isPlaying || isExercise || isShowingResult) {
-                            controlBtns.setVisibility(View.GONE);
-                        } else {
-                            controlBtns.setVisibility(View.VISIBLE);
-                        }
+            public void run() {
+                if (getView() == null) {
+                    return;
+                }
 
-                        ViewGroup answerBtns = (ViewGroup) getView().findViewById(R.id.answerBtns);
-                        if ((isPlaying || isExercise) && playerA.currWord != null) {
-                            answerBtns.setVisibility(View.VISIBLE);
-                        } else {
-                            answerBtns.setVisibility(View.GONE);
-                        }
+                // 玩家A信息区/动画区切换
+                if (isPlaying) {
+                    playerA.info.setVisibility(View.GONE);
+                    playerA.field.setVisibility(View.VISIBLE);
+                } else {
+                    playerA.info.setVisibility(View.VISIBLE);
+                    playerA.field.setVisibility(View.GONE);
+                }
+
+                // 玩家B信息区/动画区切换
+                if (isPlaying && !isExercise) {
+                    playerB.info.setVisibility(View.GONE);
+                    playerB.field.setVisibility(View.VISIBLE);
+                } else {
+                    playerB.info.setVisibility(View.VISIBLE);
+                    playerB.field.setVisibility(View.GONE);
+                }
+
+                // 控制按钮区显示/隐藏
+                ViewGroup controlBtns = (ViewGroup) getView().findViewById(R.id.controlBtns);
+                if (isPlaying || isShowingResult) {
+                    controlBtns.setVisibility(View.GONE);
+                } else {
+                    controlBtns.setVisibility(View.VISIBLE);
+                }
+
+                // 答案按钮区显示/隐藏
+                ViewGroup answerBtns = (ViewGroup) getView().findViewById(R.id.answerBtns);
+                if (isPlaying && playerA.currWord != null) {
+                    answerBtns.setVisibility(View.VISIBLE);
+
+                    Button btn4 = (Button) getView().findViewById(R.id.btn4);
+                    Button btn5 = (Button) getView().findViewById(R.id.btn5);
+                    if (isExercise) {
+                        btn4.setVisibility(View.VISIBLE);
+                        btn5.setVisibility(View.VISIBLE);
+                    } else {
+                        btn4.setVisibility(View.GONE);
+                        btn5.setVisibility(View.GONE);
                     }
-                });
+                } else {
+                    answerBtns.setVisibility(View.GONE);
+                }
             }
         });
     }
@@ -477,21 +559,29 @@ public class RussiaFragment extends MyFragment {
 
         initSocket();
 
-        ViewGroup field = (ViewGroup) getView().findViewById(R.id.myField);
-        field.getLayoutParams().height = playerA.playGroundHeight;
-        playerA.field = field;
+        // player A
+        playerA.field = (ViewGroup) getView().findViewById(R.id.playerAField);
+        playerA.field.getLayoutParams().height = playerA.playGroundHeight;
+        playerA.info = (ViewGroup) getView().findViewById(R.id.playerAInfo);
+        playerA.info.getLayoutParams().height = playerA.playGroundHeight;
         playerA.wordView = (TextView) getView().findViewById(R.id.myWordSpell);
         playerA.deadWordsArea = (ViewGroup) getView().findViewById(R.id.myDeadWordsArea);
         playerA.jacksArea = (View) getView().findViewById(R.id.myJacksArea);
         playerA.wordView.setHeight(playerA.wordDivHeight);
+        playerA.info.setVisibility(View.VISIBLE);
+        playerA.field.setVisibility(View.GONE);
 
-        field = (ViewGroup) getView().findViewById(R.id.hisField);
-        field.getLayoutParams().height = playerB.playGroundHeight;
-        playerB.field = field;
+        // player B
+        playerB.field = (ViewGroup) getView().findViewById(R.id.playerBField);
+        playerB.field.getLayoutParams().height = playerB.playGroundHeight;
+        playerB.info = (ViewGroup) getView().findViewById(R.id.playerBInfo);
+        playerB.info.getLayoutParams().height = playerB.playGroundHeight;
         playerB.wordView = (TextView) getView().findViewById(R.id.hisWordSpell);
         playerB.deadWordsArea = (ViewGroup) getView().findViewById(R.id.hisDeadWordsArea);
         playerB.jacksArea = (View) getView().findViewById(R.id.hisJacksArea);
         playerB.wordView.setHeight(playerB.wordDivHeight);
+        playerB.info.setVisibility(View.VISIBLE);
+        playerB.field.setVisibility(View.GONE);
 
         // [开始比赛]按钮
         View btnStartGame = getView().findViewById(R.id.btnStartGame);
@@ -499,6 +589,33 @@ public class RussiaFragment extends MyFragment {
             @Override
             public void onClick(View v) {
                 startMatch();
+            }
+        });
+
+        // [换房间]按钮
+        View btnChangeRoom = getView().findViewById(R.id.btnChangeRoom);
+        btnChangeRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeRoom();
+            }
+        });
+
+        // [单人练习]按钮
+        View btnExercise = getView().findViewById(R.id.btnExercise);
+        btnExercise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exercise();
+            }
+        });
+
+        // [离开]按钮
+        View btnExit = getView().findViewById(R.id.btnExit);
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exit();
             }
         });
 
@@ -526,6 +643,22 @@ public class RussiaFragment extends MyFragment {
             }
         });
 
+        // [answer4]按钮
+        getBtn4().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickAnswer(4);
+            }
+        });
+
+        // [answer5]按钮
+        getBtn5().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickAnswer(5);
+            }
+        });
+
         // [加]道具
         ImageButton inc = (ImageButton) getView().findViewById(R.id.inc);
         inc.setOnClickListener(new View.OnClickListener() {
@@ -544,6 +677,7 @@ public class RussiaFragment extends MyFragment {
             }
         });
 
+        showingResultTimer = new Timer();
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -583,13 +717,20 @@ public class RussiaFragment extends MyFragment {
         return (Button) getView().findViewById(R.id.btn3);
     }
 
+    private Button getBtn4() {
+        return (Button) getView().findViewById(R.id.btn4);
+    }
+
+    private Button getBtn5() {
+        return (Button) getView().findViewById(R.id.btn5);
+    }
+
     private void onClickAnswer(int btnIndex) {
         if (!isPlaying || playerA.currWord == null) {
             return;
         }
 
-        if (btnIndex == 5) {
-            isPlaying = false;
+        if (btnIndex == 5) { // 结束练习
             sendGameOverCmd(playerA);
         } else if (btnIndex == this.playerA.correctIndex) { // 选对了
             playerA.currWordTop = 0;
@@ -607,6 +748,8 @@ public class RussiaFragment extends MyFragment {
     public void onDestroyView() {
         timer.cancel();
         timer = null;
+        showingResultTimer.cancel();
+        showingResultTimer = null;
         super.onDestroyView();
     }
 
@@ -633,7 +776,7 @@ public class RussiaFragment extends MyFragment {
     }
 
     String gameState = "";
-    boolean isShowingResult = false;
+    volatile boolean isShowingResult = false;
     String gameResultHint1 = "";
     String gameResultHint2 = "";
     String gameResultHint3 = "";
@@ -669,6 +812,7 @@ public class RussiaFragment extends MyFragment {
         String code;
 
         ViewGroup field;
+        ViewGroup info;
         TextView wordView;
         List<WordVo> deadWords = new LinkedList<>(); // 死亡单词（注意，当使用【减一行】道具时，相应的死亡单词并不会删除，而仅仅是在界面上删除）
         ViewGroup deadWordsArea;
@@ -676,32 +820,74 @@ public class RussiaFragment extends MyFragment {
     }
 
     private Timer timer;
+    private Timer showingResultTimer; // 显示比赛结果定时器，若干秒后结束显示
     private static final int timeInterval = 200;  // 游戏主循环的时间间隔
     private boolean isPlaying;
     private final Player playerA = new Player("A");
     private final Player playerB = new Player("B");
 
     private void gameloop() {
-        if (this.isPlaying) {
-            this.moveWord(playerA);
-            this.moveWord(playerB);
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isPlaying) {
+                    moveWord(playerA);
+                    moveWord(playerB);
+                }
+            }
+        });
     }
 
     private void startGame() {
-        this.isPlaying = true;
-        this.resetProps();
-        this.initGameForPlayer(this.playerA);
-        this.initGameForPlayer(this.playerB);
+        getAvailableActivity(new IActivityEnabledListener() {
+            @Override
+            public void onActivityEnabled(MainActivity activity) {
+                activity.runOnUiThread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                isPlaying = true;
+                                resetProps();
+                                initGameForPlayer(playerA);
+                                initGameForPlayer(playerB);
 
-        this.sendUserCmd("GET_NEXT_WORD", new Object[]{this.playerA.wordIndex++, "", ""});
+                                showingResultTimer.cancel();
+                                sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "", ""});
+                            }
+                        }
+                );
+            }
+        });
     }
 
     private void startMatch() {
         this.sendUserCmd("START_GAME", new Object[]{});
     }
 
-    private void initGameForPlayer(Player player) {
+
+    private void changeRoom() {
+        getMainActivity().switchToRussiaFragment(RussiaFragment.this, hallName, roomId);
+    }
+
+    private void exit() {
+        getAvailableActivity(new IActivityEnabledListener() {
+            @Override
+            public void onActivityEnabled(MainActivity activity) {
+                activity.switchToMeFragment(RussiaFragment.this);
+            }
+        });
+    }
+
+    private void exercise() {
+        sendUserCmd("START_EXERCISE", new Object[]{});
+    }
+
+    private void initGameForPlayer(final Player player) {
+        if (player == playerA || (player == playerB && !isExercise)) {
+            player.info.setVisibility(View.GONE);
+            player.field.setVisibility(View.VISIBLE);
+        }
+
         clearDeadWords(player);
         player.wordIndex = 0;
         player.correctCount = 0;
@@ -858,7 +1044,6 @@ public class RussiaFragment extends MyFragment {
     }
 
     private void onPlayGroudFull(final Player player) {
-        this.isPlaying = false;
         this.sendGameOverCmd(player);
         getAvailableActivity(new IActivityEnabledListener() {
             @Override
@@ -879,6 +1064,7 @@ public class RussiaFragment extends MyFragment {
         }
 
         // 下落
+        Log.w("A", String.format("%d * %d", player.currWordTop, deadTopOfPlayer(player)));
         int wordBottom = player.currWordTop + player.wordDivHeight;
         int gap = deadTopOfPlayer(player) - wordBottom;
         int delta = Math.min(player.dropSpeed, gap);
@@ -890,6 +1076,8 @@ public class RussiaFragment extends MyFragment {
         // 碰撞检测
         if (wordBottom >= this.deadTopOfPlayer(player)) {
             if (player == this.playerA) {
+                Log.w("A", String.format("%d - %d", wordBottom, this.deadTopOfPlayer(player)));
+
                 // 触到底部则单词死亡
                 dropWord2Bottom(player, false);
 

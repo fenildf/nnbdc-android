@@ -9,13 +9,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <!--玩家A-->
+        <!--玩家A动画区-->
         <RelativeLayout
-            android:id="@+id/myField"
-            android:layout_width="match_parent"
+            android:id="@+id/playerAField"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="4dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:background="@drawable/play_ground_back"
             android:orientation="vertical">
 
@@ -47,13 +47,47 @@
                 android:background="#f00"></TextView>
         </RelativeLayout>
 
-        <!--玩家B-->
+        <!--玩家A信息展示区（与动画区重叠、互斥）-->
+        <LinearLayout
+            android:id="@+id/playerAInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/play_ground_back"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_weight="1"
+                    android:text="nickname"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/titleText" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8sp"
+                    android:layout_weight="1"
+                    android:text="value"
+                    android:textColor="@color/defaultTextColor" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!--玩家B动画区-->
         <RelativeLayout
-            android:id="@+id/hisField"
-            android:layout_width="match_parent"
+            android:id="@+id/playerBField"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
-            android:layout_weight="3"
+            android:layout_weight="1"
             android:background="@drawable/play_ground_back"
             android:orientation="vertical">
             <!--下落中的单词-->
@@ -83,6 +117,42 @@
                 android:height="0dp"
                 android:background="#f00"></TextView>
         </RelativeLayout>
+
+        <!--玩家B信息展示区（与动画区重叠、互斥）-->
+        <LinearLayout
+            android:id="@+id/playerBInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/play_ground_back"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/b1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_weight="1"
+                    android:text="nickname"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/titleText" />
+
+                <TextView
+                    android:id="@+id/b2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8sp"
+                    android:layout_weight="1"
+                    android:text="value"
+                    android:textColor="@color/defaultTextColor" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <!--道具区-->
@@ -231,6 +301,28 @@
             android:text="answer3"
             android:textAllCaps="false"
             android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/btn4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="不认识"
+            android:textAllCaps="false"
+            android:textColor="#f00"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btn5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:background="@color/buttonBackground"
+            android:text="结束练习"
+            android:textAllCaps="false"
+            android:textColor="#0ff"
+            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>

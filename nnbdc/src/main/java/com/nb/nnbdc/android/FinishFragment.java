@@ -286,8 +286,7 @@ public class FinishFragment extends MyFragment {
                         cowdungText.append(String.format("\n\n运气太好了！你得到20个牛粪！翻倍，你实际得到40个牛粪！"));
 
                         //播放欢呼声
-                        MediaPlayer mediaPlayer = MediaPlayer.create(getActivity(), R.raw.cheer);// 得到声音资源
-                        mediaPlayer.start();// 播放声音
+                        Util.playSoundByResId(R.raw.cheer, getMainActivity());
                     }
 
                     showWrongWords();
