@@ -24,6 +24,7 @@ import com.nb.nnbdc.android.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import beidanci.vo.UserGameInfo;
 import beidanci.vo.UserVo;
 import beidanci.vo.WordVo;
 
@@ -247,6 +249,31 @@ public class RussiaFragment extends MyFragment {
                         });
                     }
                 });
+                socket.off("userInfo");
+                socket.on("userInfo", new Emitter.Listener() {
+                    @Override
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JSONObject wordObj = (JSONObject) args[0];
+                                Type objectType = new TypeToken<UserGameInfo>() {
+                                }.getType();
+                                UserGameInfo userGameInfo = Util.getGsonBuilder().create().fromJson(wordObj.toString(), objectType);
+
+                                Player player;
+                                if (userGameInfo.getUserId().equals(loggedInUser.getId())) {
+                                    player = playerA;
+                                } else {
+                                    player = playerB;
+                                }
+                                player.gameInfo = userGameInfo;
+
+                                renderUserInfo(player);
+                            }
+                        });
+                    }
+                });
                 socket.off("roomId");
                 socket.on("roomId", new Emitter.Listener() {
                     @Override
@@ -400,6 +427,17 @@ public class RussiaFragment extends MyFragment {
                 });
             }
         });
+    }
+
+    private void renderUserInfo(Player player) {
+        ((TextView) player.info.findViewWithTag("nickname")).setText(player.gameInfo.getNickName());
+        ((TextView) player.info.findViewWithTag("gameScore")).setText(String.valueOf(player.gameInfo.getScore()));
+        ((TextView) player.info.findViewWithTag("cowDung")).setText(String.valueOf(player.gameInfo.getCowDung()));
+        ((TextView) player.info.findViewWithTag("winAndLost")).setText(
+                String.format("%d胜%d负", player.gameInfo.getWinCount(), player.gameInfo.getLostCount()));
+        ((TextView) player.info.findViewWithTag("winRatio")).setText(
+                player.gameInfo.getWinCount() + player.gameInfo.getLostCount() == 0 ? "-" :
+                        String.format("%.2f", player.gameInfo.getWinCount() / (player.gameInfo.getWinCount() + player.gameInfo.getLostCount())));
     }
 
     private void runOnUiThread(final Runnable runnable) {
@@ -810,6 +848,7 @@ public class RussiaFragment extends MyFragment {
         String[] otherWordMeanings = {"", ""}; // 所有备选答案的内容
         int[] props = new int[]{0, 0}; // 每种道具的数量
         String code;
+        UserGameInfo gameInfo;
 
         ViewGroup field;
         ViewGroup info;
