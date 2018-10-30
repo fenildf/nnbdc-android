@@ -132,11 +132,15 @@ public class RussiaFragment extends MyFragment {
                             @Override
                             public void run() {
                                 int userId = (int) args[0];
+                                Player player;
                                 if (userId == playerA.userId) {
-                                    playerA.started = true;
+                                    player = playerA;
                                 } else {
-                                    playerB.started = true;
+                                    player = playerB;
                                 }
+
+                                player.started = true;
+                                renderUserInfo(player);
                             }
                         });
                     }
@@ -282,6 +286,7 @@ public class RussiaFragment extends MyFragment {
                             @Override
                             public void run() {
                                 roomId = (int) args[0];
+                                renderRoomId();
                             }
                         });
                     }
@@ -421,6 +426,8 @@ public class RussiaFragment extends MyFragment {
                                 // 游戏已经分出胜负，允许查询单词的意思了
                                 forbiddenPopupDetailForAllWords = false;
                                 forbiddenWordForDetail = "";
+
+                                renderGameResult();
                             }
                         });
                     }
@@ -437,7 +444,18 @@ public class RussiaFragment extends MyFragment {
                 String.format("%d胜%d负", player.gameInfo.getWinCount(), player.gameInfo.getLostCount()));
         ((TextView) player.info.findViewWithTag("winRatio")).setText(
                 player.gameInfo.getWinCount() + player.gameInfo.getLostCount() == 0 ? "-" :
-                        String.format("%.2f", player.gameInfo.getWinCount() / (player.gameInfo.getWinCount() + player.gameInfo.getLostCount())));
+                        String.format("%.2f%%", player.gameInfo.getWinCount() * 100.0 / (player.gameInfo.getWinCount() + player.gameInfo.getLostCount() + 0.0)));
+
+        ((TextView) player.info.findViewWithTag("status")).setText(player.started ? "已开始..." : "");
+    }
+
+    private void renderGameResult() {
+        ((TextView) getView().findViewById(R.id.gameResultHint1)).setText(gameResultHint1);
+        ((TextView) getView().findViewById(R.id.gameResultHint2)).setText(gameResultHint2);
+    }
+
+    private void renderRoomId() {
+        ((Button) getView().findViewById(R.id.btnChangeRoom)).setText(String.format("(%d号) 换房间", roomId));
     }
 
     private void runOnUiThread(final Runnable runnable) {
@@ -458,9 +476,21 @@ public class RussiaFragment extends MyFragment {
                     public void run() {
                         TextView view = (TextView) getView().findViewById(R.id.plus_count);
                         view.setText(String.valueOf(playerA.props[0]));
+                        View incArea = getView().findViewById(R.id.incArea);
+                        if (playerA.props[0] > 0 && isPlaying) {
+                            incArea.setVisibility(View.VISIBLE);
+                        } else {
+                            incArea.setVisibility(View.GONE);
+                        }
 
                         view = (TextView) getView().findViewById(R.id.minus_count);
                         view.setText(String.valueOf(playerA.props[1]));
+                        View decArea = getView().findViewById(R.id.decArea);
+                        if (playerA.props[1] > 0 && isPlaying) {
+                            decArea.setVisibility(View.VISIBLE);
+                        } else {
+                            decArea.setVisibility(View.GONE);
+                        }
                     }
                 });
             }
@@ -530,7 +560,7 @@ public class RussiaFragment extends MyFragment {
     }
 
     /**
-     * 显示/隐藏 控制按钮
+     * 根据游戏当前状态显示/隐藏界面元素
      */
     private void updateUI() {
         runOnUiThread(new Runnable() {
@@ -558,6 +588,9 @@ public class RussiaFragment extends MyFragment {
                     playerB.field.setVisibility(View.GONE);
                 }
 
+                // 道具区显示/隐藏
+                renderProps();
+
                 // 控制按钮区显示/隐藏
                 ViewGroup controlBtns = (ViewGroup) getView().findViewById(R.id.controlBtns);
                 if (isPlaying || isShowingResult) {
@@ -582,6 +615,14 @@ public class RussiaFragment extends MyFragment {
                     }
                 } else {
                     answerBtns.setVisibility(View.GONE);
+                }
+
+                // 比赛结果展示区显示/隐藏
+                ViewGroup gameResult = (ViewGroup) getView().findViewById(R.id.gameResult);
+                if (isShowingResult) {
+                    gameResult.setVisibility(View.VISIBLE);
+                } else {
+                    gameResult.setVisibility(View.GONE);
                 }
             }
         });
@@ -608,6 +649,7 @@ public class RussiaFragment extends MyFragment {
         playerA.wordView.setHeight(playerA.wordDivHeight);
         playerA.info.setVisibility(View.VISIBLE);
         playerA.field.setVisibility(View.GONE);
+        renderProps();
 
         // player B
         playerB.field = (ViewGroup) getView().findViewById(R.id.playerBField);
