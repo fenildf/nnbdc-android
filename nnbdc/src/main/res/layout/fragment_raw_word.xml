@@ -16,12 +16,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!--单词列表-->
             <LinearLayout
+                android:id="@+id/wordsList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/wordsList"></LinearLayout>
+                android:orientation="vertical"></LinearLayout>
 
+            <!--底部滚动提示-->
             <TextView
                 android:id="@+id/scrollStatus"
                 android:layout_width="match_parent"
