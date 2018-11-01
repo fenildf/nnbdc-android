@@ -24,7 +24,6 @@ import com.nb.nnbdc.android.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -360,7 +359,7 @@ public class RussiaFragment extends MyFragment {
                                     if (answerResult.equals("true")) {
                                         playerB.currWordTop = 0;
                                     } else if (answerResult.equals("false")) {
-                                        dropWord2Bottom(playerB, false);
+                                        dropWord2Bottom(playerB);
                                     }
 
                                     String spell = (String) params.get(1);
@@ -374,7 +373,7 @@ public class RussiaFragment extends MyFragment {
                                             activity.runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    playerB.wordView.setText(playerB.currWord.getSpell());
+                                                    playerB.droppingWordView.setText(playerB.currWord.getSpell());
                                                 }
                                             });
                                         }
@@ -419,7 +418,7 @@ public class RussiaFragment extends MyFragment {
                                 } else {
                                     gameResultHint1 = "胜利啦！";
                                     gameResultHint2 = "回答错误的单词，已被自动加入到生词本";
-                                    dropWord2Bottom(playerB, true);
+                                    dropWord2Bottom(playerB);
                                     playSound(R.raw.victory);
                                 }
 
@@ -507,7 +506,7 @@ public class RussiaFragment extends MyFragment {
     }
 
     private void renderPlayerAWord() {
-        playerA.wordView.setText(playerA.currWord.getSpell());
+        playerA.droppingWordView.setText(playerA.currWord.getSpell());
         renderAnswerBtns();
     }
 
@@ -643,10 +642,10 @@ public class RussiaFragment extends MyFragment {
         playerA.field.getLayoutParams().height = playerA.playGroundHeight;
         playerA.info = (ViewGroup) getView().findViewById(R.id.playerAInfo);
         playerA.info.getLayoutParams().height = playerA.playGroundHeight;
-        playerA.wordView = (TextView) getView().findViewById(R.id.myWordSpell);
+        playerA.droppingWordView = (TextView) getView().findViewById(R.id.myWordSpell);
         playerA.deadWordsArea = (ViewGroup) getView().findViewById(R.id.myDeadWordsArea);
         playerA.jacksArea = (View) getView().findViewById(R.id.myJacksArea);
-        playerA.wordView.setHeight(playerA.wordDivHeight);
+        playerA.droppingWordView.setHeight(playerA.wordDivHeight);
         playerA.info.setVisibility(View.VISIBLE);
         playerA.field.setVisibility(View.GONE);
         renderProps();
@@ -656,10 +655,10 @@ public class RussiaFragment extends MyFragment {
         playerB.field.getLayoutParams().height = playerB.playGroundHeight;
         playerB.info = (ViewGroup) getView().findViewById(R.id.playerBInfo);
         playerB.info.getLayoutParams().height = playerB.playGroundHeight;
-        playerB.wordView = (TextView) getView().findViewById(R.id.hisWordSpell);
+        playerB.droppingWordView = (TextView) getView().findViewById(R.id.hisWordSpell);
         playerB.deadWordsArea = (ViewGroup) getView().findViewById(R.id.hisDeadWordsArea);
         playerB.jacksArea = (View) getView().findViewById(R.id.hisJacksArea);
-        playerB.wordView.setHeight(playerB.wordDivHeight);
+        playerB.droppingWordView.setHeight(playerB.wordDivHeight);
         playerB.info.setVisibility(View.VISIBLE);
         playerB.field.setVisibility(View.GONE);
 
@@ -816,7 +815,7 @@ public class RussiaFragment extends MyFragment {
             playerA.currWordTop = 0;
             sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "true", playerA.currWord.getSpell()});
         } else { // 选错了
-            dropWord2Bottom(this.playerA, false);
+            dropWord2Bottom(this.playerA);
             sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "false", playerA.currWord.getSpell()});
         }
         playerA.currWord = null;
@@ -894,7 +893,7 @@ public class RussiaFragment extends MyFragment {
 
         ViewGroup field;
         ViewGroup info;
-        TextView wordView;
+        TextView droppingWordView;
         List<WordVo> deadWords = new LinkedList<>(); // 死亡单词（注意，当使用【减一行】道具时，相应的死亡单词并不会删除，而仅仅是在界面上删除）
         ViewGroup deadWordsArea;
         View jacksArea;
@@ -992,7 +991,7 @@ public class RussiaFragment extends MyFragment {
         //return player.playGroundHeight - player.bottomHeight - player.wordDivHeight * player.deadWords.size();
     }
 
-    private void dropWord2Bottom(final Player player, final boolean clearDroppingWord) {
+    private void dropWord2Bottom(final Player player) {
         player.deadWords.add(player.currWord);
         player.currWordTop = 0;
         final WordVo deadWord = player.currWord;
@@ -1004,9 +1003,8 @@ public class RussiaFragment extends MyFragment {
                     @Override
                     public void run() {
                         addDeadWord(deadWord, player);
-                        if (clearDroppingWord) {
-                            player.wordView.setText("");
-                        }
+                        player.droppingWordView.setY(0);
+                        player.droppingWordView.setText("");
                     }
                 });
             }
@@ -1132,7 +1130,7 @@ public class RussiaFragment extends MyFragment {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        player.wordView.setText("");
+                        player.droppingWordView.setText("");
                     }
                 });
             }
@@ -1151,8 +1149,8 @@ public class RussiaFragment extends MyFragment {
         int delta = Math.min(player.dropSpeed, gap);
         player.currWordTop += delta;
         wordBottom = player.currWordTop + player.wordDivHeight;
-        TextView wordView = player.wordView;
-        wordView.setY(player.currWordTop);
+        TextView droppingWordView = player.droppingWordView;
+        droppingWordView.setY(player.currWordTop);
 
         // 碰撞检测
         if (wordBottom >= this.deadTopOfPlayer(player)) {
@@ -1160,7 +1158,7 @@ public class RussiaFragment extends MyFragment {
                 Log.w("A", String.format("%d - %d", wordBottom, this.deadTopOfPlayer(player)));
 
                 // 触到底部则单词死亡
-                dropWord2Bottom(player, false);
+                dropWord2Bottom(player);
 
                 // 达到顶部则游戏结束(己方窗口达到顶部)
                 if (isPlayGroundFull(player)) {
