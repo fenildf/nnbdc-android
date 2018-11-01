@@ -357,7 +357,7 @@ public class RussiaFragment extends MyFragment {
                                     String answerResult = (String) params.get(0);
 
                                     if (answerResult.equals("true")) {
-                                        playerB.currWordTop = 0;
+                                        playerB.droppingWordView.setY(0);
                                     } else if (answerResult.equals("false")) {
                                         dropWord2Bottom(playerB);
                                     }
@@ -506,8 +506,10 @@ public class RussiaFragment extends MyFragment {
     }
 
     private void renderPlayerAWord() {
-        playerA.droppingWordView.setText(playerA.currWord.getSpell());
-        renderAnswerBtns();
+        if (playerA.currWord != null) {
+            playerA.droppingWordView.setText(playerA.currWord.getSpell());
+            renderAnswerBtns();
+        }
     }
 
     private void liftDeadWords(final Player player, final int delta) {
@@ -812,7 +814,7 @@ public class RussiaFragment extends MyFragment {
         if (btnIndex == 5) { // 结束练习
             sendGameOverCmd(playerA);
         } else if (btnIndex == this.playerA.correctIndex) { // 选对了
-            playerA.currWordTop = 0;
+            playerA.droppingWordView.setY(0);
             sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "true", playerA.currWord.getSpell()});
         } else { // 选错了
             dropWord2Bottom(this.playerA);
@@ -881,7 +883,6 @@ public class RussiaFragment extends MyFragment {
         int dropSpeed = 2;
         WordVo currWord;
         int wordDivHeight = 40;
-        int currWordTop = 0;
         int wordIndex = 0;
         int correctCount = 0;
         int playGroundHeight = 400;
@@ -971,7 +972,7 @@ public class RussiaFragment extends MyFragment {
         clearDeadWords(player);
         player.wordIndex = 0;
         player.correctCount = 0;
-        player.currWordTop = 0;
+        player.droppingWordView.setY(0);
         player.jacksArea.getLayoutParams().height = 0;
         player.started = false;
     }
@@ -993,22 +994,11 @@ public class RussiaFragment extends MyFragment {
 
     private void dropWord2Bottom(final Player player) {
         player.deadWords.add(player.currWord);
-        player.currWordTop = 0;
+        player.droppingWordView.setY(0);
         final WordVo deadWord = player.currWord;
 
-        getAvailableActivity(new IActivityEnabledListener() {
-            @Override
-            public void onActivityEnabled(MainActivity activity) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addDeadWord(deadWord, player);
-                        player.droppingWordView.setY(0);
-                        player.droppingWordView.setText("");
-                    }
-                });
-            }
-        });
+        addDeadWord(deadWord, player);
+        player.droppingWordView.setText("");
     }
 
     /**
@@ -1143,20 +1133,15 @@ public class RussiaFragment extends MyFragment {
         }
 
         // 下落
-        Log.w("A", String.format("%d * %d", player.currWordTop, deadTopOfPlayer(player)));
-        int wordBottom = player.currWordTop + player.wordDivHeight;
-        int gap = deadTopOfPlayer(player) - wordBottom;
-        int delta = Math.min(player.dropSpeed, gap);
-        player.currWordTop += delta;
-        wordBottom = player.currWordTop + player.wordDivHeight;
         TextView droppingWordView = player.droppingWordView;
-        droppingWordView.setY(player.currWordTop);
+        float wordBottom = droppingWordView.getY() + droppingWordView.getHeight();
+        float gap = deadTopOfPlayer(player) - wordBottom;
+        float delta = Math.min(player.dropSpeed, gap);
+        droppingWordView.setY(droppingWordView.getY() + delta);
 
         // 碰撞检测
-        if (wordBottom >= this.deadTopOfPlayer(player)) {
+        if (droppingWordView.getY() + droppingWordView.getHeight() >= this.deadTopOfPlayer(player)) {
             if (player == this.playerA) {
-                Log.w("A", String.format("%d - %d", wordBottom, this.deadTopOfPlayer(player)));
-
                 // 触到底部则单词死亡
                 dropWord2Bottom(player);
 
@@ -1168,6 +1153,7 @@ public class RussiaFragment extends MyFragment {
 
                 // 取下一个单词
                 this.sendUserCmd("GET_NEXT_WORD", new Object[]{player.wordIndex++, "false", player.currWord.getSpell()});
+                player.currWord = null;
             } else {
                 // 达到顶部则游戏结束(对方窗口达到顶部)
                 if (isPlayGroundFull(player)) {
