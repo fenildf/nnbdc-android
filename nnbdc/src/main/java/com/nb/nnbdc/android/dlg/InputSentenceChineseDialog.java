@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.nb.nnbdc.R;
 import com.nb.nnbdc.android.MyActivity;
 import com.nb.nnbdc.android.util.ImmUtils;
+import com.nb.nnbdc.android.util.StringUtils;
 import com.nb.nnbdc.android.util.ToastUtil;
 
 import java.io.IOException;
@@ -49,6 +50,10 @@ public class InputSentenceChineseDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 String chinese = ((EditText) findViewById(R.id.content)).getText().toString().trim();
+                if (StringUtils.isEmpty(chinese.trim())) {
+                    ToastUtil.showToast(activity, "内容不能为空");
+                    return;
+                }
                 SaveSentenceDiyItemTask task = new SaveSentenceDiyItemTask(chinese);
                 task.execute((Void) null);
             }

@@ -197,7 +197,7 @@ public class WordDetailUtil {
             }
 
             //删除
-            if (diyItem.getAuthor().getUserName().equalsIgnoreCase(Util.getUserNameOfLoggedInUser(fragment.getActivity()))) {
+            if (diyItem.getAuthor().equals(Util.getCachedLoggedInUser(fragment.getActivity()))) {
                 ImageView deleteImgView = (ImageView) ugcChineseItemLayout.findViewById(R.id.deleteImg);
                 deleteImgView.setImageResource(R.drawable.delete);
                 deleteImgView.setAlpha(0.5f);

@@ -318,8 +318,11 @@ public class LoginActivity extends MyActivity {
         String userName = null;
         String password = null;
         try {
-            userName = Util.getUserNameOfLoggedInUser(LoginActivity.this);
-            password = Util.getPasswordOfLoggedInUser(LoginActivity.this);
+            UserVo user = Util.getCachedLoggedInUser(LoginActivity.this);
+            if (!user.getUserName().startsWith("guest_")) {
+                userName = user.getUserName();
+                password = user.getPassword();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

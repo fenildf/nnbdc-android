@@ -76,6 +76,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import beidanci.util.Utils;
+import beidanci.vo.GetWordResult;
 import beidanci.vo.Result;
 import beidanci.vo.SearchWordResult;
 import beidanci.vo.UserVo;
@@ -348,16 +349,6 @@ public class Util {
         SharedPreferences settings = context.getSharedPreferences("loggedInUser", Activity.MODE_PRIVATE);
         UserVo user = Util.getGsonBuilder().create().fromJson(settings.getString("json", null), UserVo.class);
         return user;
-    }
-
-    public static String getPasswordOfLoggedInUser(Context context) throws JSONException {
-        SharedPreferences settings = context.getSharedPreferences("loggedInUser", Activity.MODE_PRIVATE);
-        return settings.getString("password", null);
-    }
-
-    public static String getUserNameOfLoggedInUser(Context context) throws JSONException {
-        SharedPreferences settings = context.getSharedPreferences("loggedInUser", Activity.MODE_PRIVATE);
-        return settings.getString("userName", null);
     }
 
     /**

@@ -198,6 +198,7 @@ public class RussiaFragment extends MyFragment {
                                     String nickName = (String) params.get(1);
                                     Player player = userId == loggedInUser.getId() ? playerA : playerB;
                                     player.userId = userId;
+                                    player.nickName = nickName;
 
                                     //播放开门声
                                     playSound(R.raw.enterroom);
@@ -252,8 +253,8 @@ public class RussiaFragment extends MyFragment {
                         });
                     }
                 });
-                socket.off("userInfo");
-                socket.on("userInfo", new Emitter.Listener() {
+                socket.off("userGameInfo");
+                socket.on("userGameInfo", new Emitter.Listener() {
                     @Override
                     public void call(final Object... args) {
                         runOnUiThread(new Runnable() {
@@ -273,6 +274,26 @@ public class RussiaFragment extends MyFragment {
                                 player.gameInfo = userGameInfo;
 
                                 renderUserInfo(player);
+                            }
+                        });
+                    }
+                });
+                socket.off("scoreAdjust");
+                socket.on("scoreAdjust", new Emitter.Listener() {
+                    @Override
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    JSONArray params = (JSONArray) args[0];
+                                    playerA.scoreAdjust = (int) params.get(0);
+                                    playerA.cowdungAdjust = (int) params.get(1);
+                                    renderScoreAdjust(playerA, false);
+                                } catch (JSONException e) {
+                                    Log.e("", e.getMessage());
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
@@ -433,6 +454,21 @@ public class RussiaFragment extends MyFragment {
                 });
             }
         });
+    }
+
+    private void renderScoreAdjust(Player player, boolean hide) {
+        ViewGroup scoreAdjustArea = (ViewGroup) player.info.findViewById(R.id.scoreAdjustArea);
+        if (hide) {
+            scoreAdjustArea.setVisibility(View.GONE);
+        } else {
+            scoreAdjustArea.setVisibility(View.VISIBLE);
+            TextView scoreAdjustView = (TextView) scoreAdjustArea.findViewWithTag("scoreAdjust");
+            scoreAdjustView.setText(player.scoreAdjust > 0 ? "+ " + player.scoreAdjust : "- " + player.scoreAdjust * (-1));
+            scoreAdjustView.setTextColor(player.scoreAdjust > 0 ? Color.GREEN : Color.RED);
+            TextView cowdungAdjustView = (TextView) scoreAdjustArea.findViewWithTag("cowdungAdjust");
+            cowdungAdjustView.setText(player.cowdungAdjust > 0 ? "+ " + player.cowdungAdjust : "- " + player.cowdungAdjust * (-1));
+            cowdungAdjustView.setTextColor(player.cowdungAdjust > 0 ? Color.GREEN : Color.RED);
+        }
     }
 
     private void renderUserInfo(Player player) {
@@ -644,8 +680,10 @@ public class RussiaFragment extends MyFragment {
         playerA.field.getLayoutParams().height = playerA.playGroundHeight;
         playerA.info = (ViewGroup) getView().findViewById(R.id.playerAInfo);
         playerA.info.getLayoutParams().height = playerA.playGroundHeight;
-        playerA.droppingWordView = (TextView) getView().findViewById(R.id.myWordSpell);
-        playerA.deadWordsArea = (ViewGroup) getView().findViewById(R.id.myDeadWordsArea);
+        playerA.droppingWordView = (TextView) getView().findViewById(R.id.playerADroppingWord);
+        playerA.droppingWordView.setY(0);
+        playerA.droppingWordView.setText("");
+        playerA.deadWordsArea = (ViewGroup) getView().findViewById(R.id.playerADeadWordsArea);
         playerA.jacksArea = (View) getView().findViewById(R.id.myJacksArea);
         playerA.droppingWordView.setHeight(playerA.wordDivHeight);
         playerA.info.setVisibility(View.VISIBLE);
@@ -657,8 +695,10 @@ public class RussiaFragment extends MyFragment {
         playerB.field.getLayoutParams().height = playerB.playGroundHeight;
         playerB.info = (ViewGroup) getView().findViewById(R.id.playerBInfo);
         playerB.info.getLayoutParams().height = playerB.playGroundHeight;
-        playerB.droppingWordView = (TextView) getView().findViewById(R.id.hisWordSpell);
-        playerB.deadWordsArea = (ViewGroup) getView().findViewById(R.id.hisDeadWordsArea);
+        playerB.droppingWordView = (TextView) getView().findViewById(R.id.playerBDroppingWord);
+        playerB.droppingWordView.setY(0);
+        playerB.droppingWordView.setText("");
+        playerB.deadWordsArea = (ViewGroup) getView().findViewById(R.id.playerBDeadWordsArea);
         playerB.jacksArea = (View) getView().findViewById(R.id.hisJacksArea);
         playerB.droppingWordView.setHeight(playerB.wordDivHeight);
         playerB.info.setVisibility(View.VISIBLE);
@@ -891,6 +931,8 @@ public class RussiaFragment extends MyFragment {
         int[] props = new int[]{0, 0}; // 每种道具的数量
         String code;
         UserGameInfo gameInfo;
+        int scoreAdjust; // 最近一局比赛导致的积分调整量
+        int cowdungAdjust;// 最近一局比赛导致的牛粪调整量
 
         ViewGroup field;
         ViewGroup info;
@@ -974,6 +1016,9 @@ public class RussiaFragment extends MyFragment {
         player.correctCount = 0;
         player.droppingWordView.setY(0);
         player.jacksArea.getLayoutParams().height = 0;
+        if (player == playerA) {
+            renderScoreAdjust(player, true);
+        }
         player.started = false;
     }
 

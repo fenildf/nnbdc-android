@@ -21,17 +21,17 @@
 
             <!--下落中的单词-->
             <TextView
-                android:id="@+id/myWordSpell"
-                android:layout_width="wrap_content"
+                android:id="@+id/playerADroppingWord"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
                 android:text="哈哈嘻嘻"
+                android:textAlignment="center"
                 android:textColor="@color/currentWord"
                 android:textSize="16sp" />
 
             <!--底部死亡单词区-->
             <LinearLayout
-                android:id="@+id/myDeadWordsArea"
+                android:id="@+id/playerADeadWordsArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/myJacksArea"
@@ -185,7 +185,66 @@
                     android:textColor="@color/defaultTextColor" />
             </LinearLayout>
 
-            <!--状态-->
+            <!--上局比赛得失（积分和牛粪）-->
+            <LinearLayout
+                android:id="@+id/scoreAdjustArea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8sp"
+                android:orientation="vertical">
+
+                <!--积分得失-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_weight="1"
+                        android:text="游戏分"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/titleText" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8sp"
+                        android:layout_weight="1"
+                        android:tag="scoreAdjust"
+                        android:text=""
+                        android:textColor="@color/defaultTextColor" />
+                </LinearLayout>
+
+                <!--积分得失-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_weight="1"
+                        android:text="牛粪"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/titleText" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8sp"
+                        android:layout_weight="1"
+                        android:tag="cowdungAdjust"
+                        android:text=""
+                        android:textColor="@color/defaultTextColor" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--状态（用户是否点击了开始）-->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -205,19 +264,20 @@
             android:layout_weight="1"
             android:background="@drawable/play_ground_back"
             android:orientation="vertical">
+
             <!--下落中的单词-->
             <TextView
-                android:id="@+id/hisWordSpell"
-                android:layout_width="wrap_content"
+                android:id="@+id/playerBDroppingWord"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
                 android:text="哈哈"
+                android:textAlignment="center"
                 android:textColor="@color/currentWord"
                 android:textSize="16sp" />
 
             <!--底部死亡单词区-->
             <LinearLayout
-                android:id="@+id/hisDeadWordsArea"
+                android:id="@+id/playerBDeadWordsArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/hisJacksArea"
@@ -371,7 +431,7 @@
                     android:textColor="@color/defaultTextColor" />
             </LinearLayout>
 
-            <!--状态-->
+            <!--状态（用户是否点击了开始）-->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
