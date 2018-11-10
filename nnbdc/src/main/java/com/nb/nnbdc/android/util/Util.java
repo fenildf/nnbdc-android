@@ -338,10 +338,12 @@ public class Util {
     }
 
     public static void saveLoggedInUserToCache(UserVo user, Context context) {
-        SharedPreferences settings = context.getSharedPreferences("loggedInUser", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("json", Util.toJson(user));
-        editor.commit();
+        if (!user.getUserName().startsWith("guest_")) {
+            SharedPreferences settings = context.getSharedPreferences("loggedInUser", Activity.MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("json", Util.toJson(user));
+            editor.commit();
+        }
     }
 
 
