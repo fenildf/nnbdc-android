@@ -51,7 +51,6 @@ public class HttpClient {
         try {
             String responseStr = "";
 
-
             if (requestMethod.equals("GET") && data != null) {
                 url = url + "?" + data;
             }

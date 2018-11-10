@@ -8,13 +8,16 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -62,6 +65,22 @@ public class SearchFragment extends MyFragment {
         //绑定搜索编辑框的文本变化事件处理
         EditText editSpell = (EditText) getView().findViewById(R.id.editSpell);
         editSpell.addTextChangedListener(new SpellChangeWatcher(editSpell));
+
+        // 使搜索编辑框的弹出输入法为英文
+        editSpell.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        editSpell.setImeOptions(EditorInfo.IME_ACTION_DONE); //将输入法弹出的右下角的按钮改为完成，不改的话会是下一步。
+
+        // 处理输入法软键盘的【完成】按钮事件
+        editSpell.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    doPreciseSearch();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         //绑定搜索按钮的点击事件处理
         View btnSearch = getView().findViewById(R.id.btnSearch);
@@ -170,14 +189,15 @@ public class SearchFragment extends MyFragment {
 
     private void doPreciseSearch() {
         String spell = ((EditText) getView().findViewById(R.id.editSpell)).getText().toString();
-        SearchWordTask task = new SearchWordTask(spell);
+        SearchWordTask task = new SearchWordTask(getMainActivity(), spell);
         task.execute((Void) null);
     }
 
-    private class SearchWordTask extends AsyncTask<Void, Void, SearchWordResult> {
+    private class SearchWordTask extends MyAsyncTask<Void, Void, SearchWordResult> {
         private String spell;
 
-        public SearchWordTask(String spell) {
+        public SearchWordTask(MyActivity myActivity, String spell) {
+            super(myActivity);
             this.spell = spell;
         }
 

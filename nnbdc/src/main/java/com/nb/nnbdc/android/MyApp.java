@@ -29,6 +29,8 @@ public class MyApp extends Application {
 
     private Socket socket;
 
+    private List<SocketEventListener> socketEventListeners = new ArrayList<>();
+
     public UserVo getLoggedInUser() {
         return loggedInUser;
     }
@@ -41,6 +43,10 @@ public class MyApp extends Application {
 
     public boolean isConnectedToSocketServer() {
         return isConnectedToSocketServer;
+    }
+
+    public void registerSocketEventListener(SocketEventListener listener) {
+        socketEventListeners.add(listener);
     }
 
     public void setConnectedToSocketServer(boolean connectedToSocketServer) {
@@ -75,9 +81,12 @@ public class MyApp extends Application {
                     listener.onConnected();
                 }
             }
-        }).on("event", new Emitter.Listener() {
+        }).on("inviteYouToGame", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                for (SocketEventListener listener : socketEventListeners) {
+                    listener.onSocketEvent("inviteYouToGame", args);
+                }
             }
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
@@ -144,5 +153,9 @@ public class MyApp extends Application {
         } catch (URISyntaxException e) {
             ToastUtil.showToast(this, "连接消费服务异常");
         }
+    }
+
+    public interface SocketEventListener {
+        void onSocketEvent(final String event, final Object... args);
     }
 }

@@ -958,7 +958,16 @@ public class RussiaFragment extends MyFragment {
         if (btnIndex == 5) { // 结束练习
             sendGameOverCmd(playerA);
         } else if (btnIndex == this.playerA.correctIndex) { // 选对了
-            playerA.droppingWordView.setY(0);
+            playerA.droppingWordView.setY(0); // 下落中的单词回到最上方
+
+            // 播放正确声音
+            getAvailableActivity(new IActivityEnabledListener() {
+                @Override
+                public void onActivityEnabled(MainActivity activity) {
+                    Util.playSoundByResId(R.raw.explode, activity);
+                }
+            });
+
             sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "true", playerA.currWord.getSpell()});
         } else { // 选错了
             dropWord2Bottom(this.playerA);

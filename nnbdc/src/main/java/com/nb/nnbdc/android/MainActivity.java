@@ -9,8 +9,15 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.github.nkzawa.socketio.client.Ack;
+import com.google.gson.reflect.TypeToken;
 import com.nb.nnbdc.R;
+import com.nb.nnbdc.android.util.ToastUtil;
+import com.nb.nnbdc.android.util.Util;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -103,9 +110,10 @@ public class MainActivity extends MyActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //初始化界面
+        // 初始化界面
         initView();
 
+        // 监听socket状态变化
         getAppContext().registerSocketStatusListener(new MyApp.SocketStatusListener() {
             @Override
             public void onConnected() {
@@ -118,6 +126,43 @@ public class MainActivity extends MyActivity {
             }
         });
         tryReportUserToSocketServer();
+
+        // 监听某些全局性的socket事件
+        getAppContext().registerSocketEventListener(new MyApp.SocketEventListener() {
+            @Override
+            public void onSocketEvent(final String event, final Object... args) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (event.equals("inviteYouToGame")) {
+                                JSONArray params = (JSONArray) args[0];
+                                JSONObject userObj = (JSONObject) params.get(0);
+                                Type objectType = new TypeToken<UserVo>() {
+                                }.getType();
+                                UserVo sender = Util.getGsonBuilder().create().fromJson(userObj.toString(), objectType);
+
+                                String gameType = (String) params.get(1);
+                                int room = (int) params.get(2);
+                                String hallName = (String) params.get(3);
+                                String content = sender.getDisplayNickName() + "邀请你进行游戏，级别:" + hallName;
+                                ToastUtil.showToast(MainActivity.this, content);
+                                Util.playSoundByResId(R.raw.explode, MainActivity.this);
+                           /*let msg = {
+                                   type: 'inviteYouToGame',
+                                   content: content,
+                                   sender: sender,
+                                   args: [gameType, room, hallName],
+                                    viewed: false
+                           }*/
+                            }
+                        } catch (Exception e) {
+                            ToastUtil.showToast(MainActivity.this, "系统发生异常：" + e.getMessage());
+                        }
+                    }
+                });
+            }
+        });
     }
 
     /**
