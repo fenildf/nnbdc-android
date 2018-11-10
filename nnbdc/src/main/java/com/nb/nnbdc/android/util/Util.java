@@ -530,7 +530,7 @@ public class Util {
                     ///确定被点击的span在屏幕上的位置 ----结束
 
                     //查询并显示单词详细信息
-                    SearchWordTask task = new SearchWordTask(word, context.getHttpClient(), new SearchWordTask.SearchWordListener() {
+                    SearchWordTask task = new SearchWordTask(context, word, context.getHttpClient(), new SearchWordTask.SearchWordListener() {
                         @Override
                         public void onComplete(SearchWordResult searchResult) {
                             if (searchResult == null) {

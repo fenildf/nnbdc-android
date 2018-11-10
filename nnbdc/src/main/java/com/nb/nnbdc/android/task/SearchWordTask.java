@@ -1,20 +1,21 @@
 package com.nb.nnbdc.android.task;
 
-import android.os.AsyncTask;
-
 import com.nb.nnbdc.android.HttpClient;
+import com.nb.nnbdc.android.MyActivity;
+import com.nb.nnbdc.android.MyAsyncTask;
 
 import beidanci.vo.SearchWordResult;
 
 /**
  * 向服务端发送查询指定单词的请求，当收到服务端的查询结果后，调用指定的监听器。
  */
-public class SearchWordTask extends AsyncTask<Void, Void, SearchWordResult> {
+public class SearchWordTask extends MyAsyncTask<Void, Void, SearchWordResult> {
     private HttpClient httpClient;
     private String spell;
     SearchWordListener searchWordListener;
 
-    public SearchWordTask(String spell, HttpClient httpClient, SearchWordListener searchWordListener) {
+    public SearchWordTask(MyActivity activity, String spell, HttpClient httpClient, SearchWordListener searchWordListener) {
+        super(activity);
         this.httpClient = httpClient;
         this.spell = spell;
         this.searchWordListener = searchWordListener;
@@ -33,6 +34,7 @@ public class SearchWordTask extends AsyncTask<Void, Void, SearchWordResult> {
 
     @Override
     protected void onPostExecute(final SearchWordResult result) {
+        super.onPostExecute(result);
         searchWordListener.onComplete(result);
     }
 
