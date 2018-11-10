@@ -34,12 +34,12 @@
                 android:id="@+id/playerADeadWordsArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/myJacksArea"
+                android:layout_above="@id/playerAJacksArea"
                 android:orientation="vertical"></LinearLayout>
 
             <!--底部千斤顶-->
             <TextView
-                android:id="@+id/myJacksArea"
+                android:id="@+id/playerAJacksArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
@@ -280,12 +280,12 @@
                 android:id="@+id/playerBDeadWordsArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/hisJacksArea"
+                android:layout_above="@id/playerBJacksArea"
                 android:orientation="vertical"></LinearLayout>
 
             <!--底部千斤顶-->
             <TextView
-                android:id="@+id/hisJacksArea"
+                android:id="@+id/playerBJacksArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"

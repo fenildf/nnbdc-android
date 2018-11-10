@@ -319,7 +319,7 @@ public class LoginActivity extends MyActivity {
         String password = null;
         try {
             UserVo user = Util.getCachedLoggedInUser(LoginActivity.this);
-            if (!user.getUserName().startsWith("guest_")) {
+            if (user != null && !user.getUserName().startsWith("guest_")) {
                 userName = user.getUserName();
                 password = user.getPassword();
             }

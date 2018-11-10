@@ -16,10 +16,14 @@ import android.widget.TextView;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.nb.nnbdc.R;
+import com.nb.nnbdc.android.dlg.InviteDialog;
 import com.nb.nnbdc.android.util.ToastUtil;
 import com.nb.nnbdc.android.util.Util;
+
+import junit.framework.Assert;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,8 +76,9 @@ public class RussiaFragment extends MyFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_russia, container, false);
+        View view = inflater.inflate(R.layout.fragment_russia, container, false);
+        Assert.assertTrue(view != null);
+        return view;
     }
 
     @Override
@@ -86,7 +91,7 @@ public class RussiaFragment extends MyFragment {
     private void initSocket() {
         getAvailableActivity(new IActivityEnabledListener() {
             @Override
-            public void onActivityEnabled(MainActivity activity) {
+            public void onActivityEnabled(final MainActivity activity) {
                 socket = activity.getAppContext().getSocket();
                 socket.off("sysCmd");
                 socket.on("sysCmd", new Emitter.Listener() {
@@ -118,7 +123,29 @@ public class RussiaFragment extends MyFragment {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                idleUsers = (List<UserVo>) args[0];
+                                try {
+                                    idleUsers.clear();
+                                    JSONArray userObjs = (JSONArray) args[0];
+                                    for (int i = 0; i < userObjs.length(); i++) {
+                                        JSONObject userObj = (JSONObject) userObjs.get(i);
+                                        Type objectType = new TypeToken<UserVo>() {
+                                        }.getType();
+                                        UserVo userVo = Util.getGsonBuilder().create().fromJson(userObj.toString(), objectType);
+                                        idleUsers.add(userVo);
+                                    }
+
+                                    InviteDialog inviteDialog = new InviteDialog(activity, R.style.dialog, idleUsers);
+                                    inviteDialog.registerInviteUserListeners(new InviteDialog.InviteUserListener() {
+                                        @Override
+                                        public void invite(UserVo userToInvite) {
+                                            sendUserCmd("inviteUser", new Object[]{userToInvite.getId(), "russia", roomId, hallName});
+                                        }
+                                    });
+                                    inviteDialog.show();
+                                } catch (JSONException e) {
+                                    Log.e("", e.getMessage());
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
@@ -212,6 +239,34 @@ public class RussiaFragment extends MyFragment {
                         });
                     }
                 });
+                socket.off("leaveRoom");
+                socket.on("leaveRoom", new Emitter.Listener() {
+                    @Override
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    JSONArray params = (JSONArray) args[0];
+                                    int userId = (int) params.get(0);
+                                    String nickName = (String) params.get(1);
+                                    Player player = userId == loggedInUser.getId() ? playerA : playerB;
+                                    player.userId = null;
+                                    player.gameInfo = null;
+
+                                    //播放离开房间的声音
+                                    playSound(R.raw.leaveroom);
+
+                                    renderUserInfo(player);
+
+                                } catch (JSONException e) {
+                                    Log.e("", e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                });
                 socket.off("propsUsed");
                 socket.on("propsUsed", new Emitter.Listener() {
                     @Override
@@ -274,6 +329,30 @@ public class RussiaFragment extends MyFragment {
                                 player.gameInfo = userGameInfo;
 
                                 renderUserInfo(player);
+                            }
+                        });
+                    }
+                });
+                socket.off("enterWait");
+                socket.on("enterWait", new Emitter.Listener() {
+                    @Override
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                gameState = "waiting";
+                            }
+                        });
+                    }
+                });
+                socket.off("enterReady");
+                socket.on("enterReady", new Emitter.Listener() {
+                    @Override
+                    public void call(final Object... args) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                gameState = "ready";
                             }
                         });
                     }
@@ -472,16 +551,16 @@ public class RussiaFragment extends MyFragment {
     }
 
     private void renderUserInfo(Player player) {
-        ((TextView) player.info.findViewWithTag("nickname")).setText(player.gameInfo.getNickName());
-        ((TextView) player.info.findViewWithTag("gameScore")).setText(String.valueOf(player.gameInfo.getScore()));
-        ((TextView) player.info.findViewWithTag("cowDung")).setText(String.valueOf(player.gameInfo.getCowDung()));
-        ((TextView) player.info.findViewWithTag("winAndLost")).setText(
+        ((TextView) player.info.findViewWithTag("nickname")).setText(player.gameInfo == null ? "" : player.gameInfo.getNickName());
+        ((TextView) player.info.findViewWithTag("gameScore")).setText(player.gameInfo == null ? "" : String.valueOf(player.gameInfo.getScore()));
+        ((TextView) player.info.findViewWithTag("cowDung")).setText(player.gameInfo == null ? "" : String.valueOf(player.gameInfo.getCowDung()));
+        ((TextView) player.info.findViewWithTag("winAndLost")).setText(player.gameInfo == null ? "" :
                 String.format("%d胜%d负", player.gameInfo.getWinCount(), player.gameInfo.getLostCount()));
-        ((TextView) player.info.findViewWithTag("winRatio")).setText(
+        ((TextView) player.info.findViewWithTag("winRatio")).setText(player.gameInfo == null ? "" :
                 player.gameInfo.getWinCount() + player.gameInfo.getLostCount() == 0 ? "-" :
                         String.format("%.2f%%", player.gameInfo.getWinCount() * 100.0 / (player.gameInfo.getWinCount() + player.gameInfo.getLostCount() + 0.0)));
 
-        ((TextView) player.info.findViewWithTag("status")).setText(player.started ? "已开始..." : "");
+        ((TextView) player.info.findViewWithTag("status")).setText(player.gameInfo == null ? "" : player.started ? "已开始..." : "");
     }
 
     private void renderGameResult() {
@@ -636,6 +715,22 @@ public class RussiaFragment extends MyFragment {
                     controlBtns.setVisibility(View.VISIBLE);
                 }
 
+                // 开始比赛按钮显示/隐藏
+                Button startMatchBtn = (Button) getView().findViewById(R.id.btnStartGame);
+                if (gameState.equals("ready") && !playerA.started) {
+                    startMatchBtn.setVisibility(View.VISIBLE);
+                } else {
+                    startMatchBtn.setVisibility(View.GONE);
+                }
+
+                // 邀请对手按钮显示/隐藏
+                Button inviteBtn = (Button) getView().findViewById(R.id.btnInvite);
+                if (gameState.equals("waiting")) {
+                    inviteBtn.setVisibility(View.VISIBLE);
+                } else {
+                    inviteBtn.setVisibility(View.GONE);
+                }
+
                 // 答案按钮区显示/隐藏
                 ViewGroup answerBtns = (ViewGroup) getView().findViewById(R.id.answerBtns);
                 if (isPlaying && playerA.currWord != null) {
@@ -684,7 +779,7 @@ public class RussiaFragment extends MyFragment {
         playerA.droppingWordView.setY(0);
         playerA.droppingWordView.setText("");
         playerA.deadWordsArea = (ViewGroup) getView().findViewById(R.id.playerADeadWordsArea);
-        playerA.jacksArea = (View) getView().findViewById(R.id.myJacksArea);
+        playerA.jacksArea = (View) getView().findViewById(R.id.playerAJacksArea);
         playerA.droppingWordView.setHeight(playerA.wordDivHeight);
         playerA.info.setVisibility(View.VISIBLE);
         playerA.field.setVisibility(View.GONE);
@@ -699,7 +794,7 @@ public class RussiaFragment extends MyFragment {
         playerB.droppingWordView.setY(0);
         playerB.droppingWordView.setText("");
         playerB.deadWordsArea = (ViewGroup) getView().findViewById(R.id.playerBDeadWordsArea);
-        playerB.jacksArea = (View) getView().findViewById(R.id.hisJacksArea);
+        playerB.jacksArea = (View) getView().findViewById(R.id.playerBJacksArea);
         playerB.droppingWordView.setHeight(playerB.wordDivHeight);
         playerB.info.setVisibility(View.VISIBLE);
         playerB.field.setVisibility(View.GONE);
@@ -710,6 +805,15 @@ public class RussiaFragment extends MyFragment {
             @Override
             public void onClick(View v) {
                 startMatch();
+            }
+        });
+
+        // [邀请对手]按钮
+        View btnInvite = getView().findViewById(R.id.btnInvite);
+        btnInvite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showIdleUsers();
             }
         });
 
@@ -905,8 +1009,7 @@ public class RussiaFragment extends MyFragment {
     List<String> msgs = new LinkedList<>();
     boolean isExercise = false;
     String wordSoundFile = "";
-    boolean isInviting = false; // 是否正在邀请其他用户
-    List<UserVo> idleUsers;
+    List<UserVo> idleUsers = new ArrayList<>();
 
     private class Player {
         protected Player(String code) {
@@ -987,6 +1090,9 @@ public class RussiaFragment extends MyFragment {
         this.sendUserCmd("START_GAME", new Object[]{});
     }
 
+    private void showIdleUsers() {
+        socket.emit("getIdleUsers", 5);
+    }
 
     private void changeRoom() {
         getMainActivity().switchToRussiaFragment(RussiaFragment.this, hallName, roomId);

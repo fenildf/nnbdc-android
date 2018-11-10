@@ -53,7 +53,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="4dp"
         android:background="@color/buttonBackground"
-        android:minWidth="80dp"
+        android:minWidth="50dp"
         android:minHeight="40dp"
         android:text="删除"
         android:textColor="@color/defaultButtonTextColor"
