@@ -184,6 +184,15 @@ public class RussiaFragment extends MyFragment {
                                         int propsIndex = (Integer) params.get(0);
                                         int propsCount = (int) params.get(1);
                                         playerA.props[propsIndex] = propsCount;
+
+                                        // 播放提示声音
+                                        getAvailableActivity(new IActivityEnabledListener() {
+                                            @Override
+                                            public void onActivityEnabled(MainActivity activity) {
+                                                Util.playSoundByResId(R.raw.explode, activity);
+                                            }
+                                        });
+
                                         renderProps();
                                     } catch (JSONException e) {
                                         Log.e("", e.getMessage());
@@ -959,14 +968,6 @@ public class RussiaFragment extends MyFragment {
             sendGameOverCmd(playerA);
         } else if (btnIndex == this.playerA.correctIndex) { // 选对了
             playerA.droppingWordView.setY(0); // 下落中的单词回到最上方
-
-            // 播放正确声音
-            getAvailableActivity(new IActivityEnabledListener() {
-                @Override
-                public void onActivityEnabled(MainActivity activity) {
-                    Util.playSoundByResId(R.raw.explode, activity);
-                }
-            });
 
             sendUserCmd("GET_NEXT_WORD", new Object[]{playerA.wordIndex++, "true", playerA.currWord.getSpell()});
         } else { // 选错了
