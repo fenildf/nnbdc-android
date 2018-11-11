@@ -16,9 +16,10 @@ import com.nb.nnbdc.android.util.Msg;
 import com.nb.nnbdc.android.util.ToastUtil;
 import com.nb.nnbdc.android.util.Util;
 
+import junit.framework.Assert;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -39,6 +40,30 @@ public class MainActivity extends MyActivity {
 
     private RadioButton btnSearch;
     private RadioButton btnGame;
+
+    public int getUnReadMsgCount() {
+        int count = 0;
+        for (Msg msg : msgs) {
+            if (!msg.isHasBeenRead()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getAllMsgCount(){
+        return msgs.size();
+    }
+
+    /**
+     * 把所有消息都置为已读状态
+     */
+    public void setAllMsgsAsRead() {
+        for (Msg msg : msgs) {
+            msg.setHasBeenRead(true);
+        }
+        renderUnViewdMsgCount();
+    }
 
     /**
      * 当点击【学习】按钮时，只有第一次点击才会显示背单词前的页面（这个页面对背单词的流程很重要，因为该页面准备今日的单词），
@@ -150,22 +175,29 @@ public class MainActivity extends MyActivity {
                     public void run() {
                         try {
                             if (event.equals("inviteYouToGame")) {
+                                // 反序列化socket消息
                                 JSONArray params = (JSONArray) args[0];
                                 JSONObject userObj = (JSONObject) params.get(0);
                                 Type objectType = new TypeToken<UserVo>() {
                                 }.getType();
                                 UserVo sender = Util.getGsonBuilder().create().fromJson(userObj.toString(), objectType);
-
                                 String gameType = (String) params.get(1);
                                 int room = (int) params.get(2);
                                 String hallName = (String) params.get(3);
                                 String content = sender.getDisplayNickName() + "邀请你进行游戏，级别:" + hallName;
-                                ToastUtil.showToast(MainActivity.this, content);
-                                Util.playSoundByResId(R.raw.explode, MainActivity.this);
+
+                                // 构造消息对象
                                 Msg msg = new Msg("inviteYouToGame", content, sender, new Object[]{gameType, room, hallName}, false);
                                 msgs.add(msg);
-                                tvMsgCount.setText(String.valueOf(msgs.size()));
-                                tvMsgCount.setVisibility(View.VISIBLE);
+
+                                // 播放提示音，并渲染未读消息数量小图标
+                                Util.playSoundByResId(R.raw.explode, MainActivity.this);
+                                renderUnViewdMsgCount();
+
+                                // 通知监听者有新消息
+                                for (NewMsgListener listener : newMsgListeners) {
+                                    listener.onNewMsg(msg);
+                                }
                             }
                         } catch (Exception e) {
                             ToastUtil.showToast(MainActivity.this, "系统发生异常：" + e.getMessage());
@@ -174,6 +206,16 @@ public class MainActivity extends MyActivity {
                 });
             }
         });
+    }
+
+    public void renderUnViewdMsgCount() {
+        int unViewedMsgCount = getUnReadMsgCount();
+        tvMsgCount.setText(String.valueOf(unViewedMsgCount));
+        if (unViewedMsgCount == 0) {
+            tvMsgCount.setVisibility(View.GONE);
+        } else {
+            tvMsgCount.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -530,12 +572,28 @@ public class MainActivity extends MyActivity {
     }
 
     public void unRegisterFragmentSwitchListener(FragmentSwitchListener listener) {
-        fragmentSwitchListeners.remove(listener);
+        boolean success = fragmentSwitchListeners.remove(listener);
+        Assert.assertTrue(success);
     }
 
     private void fireFragmentSwitchEvent(MyFragment from, MyFragment to) {
         for (FragmentSwitchListener listener : fragmentSwitchListeners) {
             listener.onFragmentSwitched(from, to);
         }
+    }
+
+    private List<NewMsgListener> newMsgListeners = new ArrayList<>();
+
+    public void registerNewMsgListener(NewMsgListener listener) {
+        newMsgListeners.add(listener);
+    }
+
+    public void unRegisterNewMsgListener(NewMsgListener listener) {
+        boolean success = newMsgListeners.remove(listener);
+        Assert.assertTrue(success);
+    }
+
+    public interface NewMsgListener {
+        void onNewMsg(Msg msg);
     }
 }

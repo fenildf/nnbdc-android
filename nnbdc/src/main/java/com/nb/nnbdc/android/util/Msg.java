@@ -1,5 +1,7 @@
 package com.nb.nnbdc.android.util;
 
+import java.util.Date;
+
 import beidanci.vo.UserVo;
 
 public class Msg {
@@ -8,15 +10,22 @@ public class Msg {
     private UserVo sender;
     private Object[] args;
 
-    public Msg(String type, String content, UserVo sender, Object[] args, boolean viewed) {
+    public Date getReceiveTime() {
+        return receiveTime;
+    }
+
+    private Date receiveTime;
+
+    public Msg(String type, String content, UserVo sender, Object[] args, boolean hasBeenRead) {
         this.type = type;
         this.content = content;
         this.sender = sender;
         this.args = args;
-        this.viewed = viewed;
+        this.hasBeenRead = hasBeenRead;
+        this.receiveTime = new Date();
     }
 
-    private boolean viewed;
+    private boolean hasBeenRead;
 
     public String getType() {
         return type;
@@ -34,7 +43,11 @@ public class Msg {
         return args;
     }
 
-    public boolean isViewed() {
-        return viewed;
+    public void setHasBeenRead(boolean hasBeenRead) {
+        this.hasBeenRead = hasBeenRead;
+    }
+
+    public boolean isHasBeenRead() {
+        return hasBeenRead;
     }
 }

@@ -24,8 +24,10 @@
     <color name="titleText">#6F51B5</color>
     <color name="toastBack">#dd000000</color>
     <color name="toastTextColor">#aaaaaa</color>
-    <color name="defaultButtonTextColor">#777777</color>
+    <color name="defaultButtonTextColor">#fff</color>
     <color name="bottomMenuTextColorSelected">#F2CA27</color>
     <color name="bottomMenuBackGround">#012C35</color>
     <color name="black_overlay">#66000000</color>
+    <color name="msg_text_unread">#ddd</color>
+    <color name="msg_text_read">#777</color>
 </resources>

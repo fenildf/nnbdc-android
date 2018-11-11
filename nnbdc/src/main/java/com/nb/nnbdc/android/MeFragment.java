@@ -2,6 +2,7 @@ package com.nb.nnbdc.android;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 
 import com.nb.nnbdc.R;
 import com.nb.nnbdc.android.task.GetLoggedInUserTask;
+import com.nb.nnbdc.android.util.Msg;
 import com.nb.nnbdc.android.util.MyProgress;
 import com.nb.nnbdc.android.util.ToastUtil;
 import com.nb.nnbdc.android.util.Util;
@@ -32,7 +35,7 @@ import java.util.Map;
 
 import beidanci.vo.UserVo;
 
-public class MeFragment extends MyFragment {
+public class MeFragment extends MyFragment implements MainActivity.NewMsgListener {
     private RenderStudyProgressTask renderStudyProgressTask = null;
     private DeleteDictTask deleteDictTask = null;
     private SaveWordsPerDayTask saveWordsPerDayTask = null;
@@ -122,12 +125,22 @@ public class MeFragment extends MyFragment {
             }
         });
 
-        getView().findViewById(R.id.msgBtn).setOnClickListener(new View.OnClickListener() {
+        // [消息]按钮事件处理
+        Button btnMsg = (Button) getView().findViewById(R.id.msgBtn);
+        btnMsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getMainActivity().switchToMsgFragment(MeFragment.this);
+                if (getMainActivity().getAllMsgCount() == 0) {
+                    ToastUtil.showToast(getMainActivity(), "无消息");
+                } else {
+                    getMainActivity().switchToMsgFragment(MeFragment.this);
+                }
             }
         });
+        renderMsgBtn();
+
+        // 监听消息
+        getMainActivity().registerNewMsgListener(this);
 
         getView().findViewById(R.id.rawWordBook).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,9 +155,40 @@ public class MeFragment extends MyFragment {
         });
     }
 
+    /**
+     * [消息]按钮渲染
+     */
+    private void renderMsgBtn() {
+        // 文字
+        MainActivity activity = getMainActivity();
+        Button btnMsg = (Button) getView().findViewById(R.id.msgBtn);
+        btnMsg.setText(String.format("%s(%s/%s)", "消息", activity.getUnReadMsgCount(), activity.getAllMsgCount()));
+
+        // 可见性
+        if (activity.getAllMsgCount() > 0) {
+            btnMsg.setVisibility(View.VISIBLE);
+        } else {
+            btnMsg.setVisibility(View.GONE);
+        }
+
+        // 颜色
+        if (activity.getUnReadMsgCount() > 0) {
+            btnMsg.setTextColor(Color.parseColor("red"));
+        } else {
+            btnMsg.setTextColor(getResources().getColor(R.color.defaultTextColor));
+        }
+    }
+
     @Override
     public void onFragmentSwitched(MyFragment from, MyFragment to) {
+        if (from == this) {
+            getMainActivity().unRegisterNewMsgListener(this);
+        }
+    }
 
+    @Override
+    public void onNewMsg(Msg msg) {
+        renderMsgBtn();
     }
 
     public class DeleteDictTask extends MyAsyncTask<View, Void, Boolean> {

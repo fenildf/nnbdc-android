@@ -29,19 +29,9 @@
 
     <!--底部按钮-->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/okBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/buttonBackground"
-            android:text="确定"
-            android:textColor="@color/defaultTextColor" />
 
         <Button
             android:id="@+id/cancelBtn"
@@ -50,7 +40,7 @@
             android:layout_marginLeft="1dp"
             android:layout_weight="1"
             android:background="@color/buttonBackground"
-            android:text="取消"
+            android:text="返回"
             android:textColor="@color/defaultTextColor" />
     </LinearLayout>
 </LinearLayout>
