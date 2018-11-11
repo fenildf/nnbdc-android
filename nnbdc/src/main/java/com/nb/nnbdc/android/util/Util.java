@@ -217,6 +217,10 @@ public class Util {
         return urlEncoded;
     }
 
+    public interface DownloadListener {
+        void progress(int downloadedBytes);
+    }
+
     /**
      * 下载指定的资源，并保存到本地指定的文件，如果本地目标文件已经存在，则不会重新下载
      *
@@ -224,7 +228,7 @@ public class Util {
      * @param localFileName
      * @return
      */
-    public static boolean downloadFile(String fileUrl, String localFileName, boolean forceDownload) {
+    public static boolean downloadFile(String fileUrl, String localFileName, boolean forceDownload, DownloadListener downloadListener) {
         File file = new File(localFileName);
         //如果目标文件已经存在，则忽略，不用重新下载
         if (file.exists() && !forceDownload) {
@@ -243,12 +247,19 @@ public class Util {
             byte[] bs = new byte[1024];
             // 读取到的数据长度
             int len;
+
+            int total = 0;
+
             // 输出的文件流
             createDirIfNotExists(localFileName);
             OutputStream os = new FileOutputStream(localFileName);
             // 开始读取
             while ((len = is.read(bs)) != -1) {
                 os.write(bs, 0, len);
+                total += len;
+                if (downloadListener != null) {
+                    downloadListener.progress(total);
+                }
             }
             // 完毕，关闭所有链接
             os.close();

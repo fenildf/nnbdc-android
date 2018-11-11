@@ -1068,7 +1068,9 @@ public class RussiaFragment extends MyFragment {
             public void run() {
                 if (isPlaying) {
                     moveWord(playerA);
-                    moveWord(playerB);
+                    if (!isExercise) {
+                        moveWord(playerB);
+                    }
                 }
             }
         });

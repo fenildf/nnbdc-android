@@ -277,6 +277,8 @@ public class LoginActivity extends MyActivity {
      * 检查程序是否存在新版本
      */
     public class CheckNewVersionTask extends MyAsyncTask<Void, Void, Object[]> {
+        private int apkSize;
+
         protected CheckNewVersionTask(MyActivity myActivity) {
             super(myActivity);
         }
@@ -284,8 +286,10 @@ public class LoginActivity extends MyActivity {
         @Override
         protected Object[] doInBackground(Void... params) {
             try {
+                apkSize = getHttpClient().getFileSize(getString(R.string.apkUrl));
                 return getHttpClient().getNewVersionCodeAndName();
             } catch (Exception e) {
+                e.printStackTrace();
                 return null;
             }
         }
@@ -303,7 +307,7 @@ public class LoginActivity extends MyActivity {
             int newVerCode = (Integer) codeAndName[0];
             if (newVerCode > vercode) {
                 String newVersionName = (String) codeAndName[1];
-                doNewVersionUpdate(newVersionName); // 更新新版本
+                doNewVersionUpdate(newVersionName, apkSize); // 更新新版本
             } else {
                 //当前已是最新版本，正常启动
                 initLoginUI();
@@ -363,7 +367,7 @@ public class LoginActivity extends MyActivity {
 
     }
 
-    private void doNewVersionUpdate(String versionName) {
+    private void doNewVersionUpdate(String versionName, final int apkSize) {
         StringBuffer sb = new StringBuffer();
         sb.append("发现新版本(");
         sb.append(versionName);
@@ -379,7 +383,8 @@ public class LoginActivity extends MyActivity {
                                 updateProgress = new ProgressDialog(LoginActivity.this);
                                 updateProgress.setTitle("正在下载");
                                 updateProgress.setMessage("请稍候...");
-                                updateProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                updateProgress.setMax(apkSize);
+                                updateProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                                 updateProgress.show();
                                 DownApkTask task = new DownApkTask(LoginActivity.this);
                                 task.execute((Void) null);
@@ -409,7 +414,12 @@ public class LoginActivity extends MyActivity {
         protected String doInBackground(Void... params) {
             try {
                 String localApkFile = Environment.getExternalStorageDirectory() + "/nnbdc.apk";
-                boolean succ = Util.downloadFile(getString(R.string.apkUrl), localApkFile, true);
+                boolean succ = Util.downloadFile(getString(R.string.apkUrl), localApkFile, true, new Util.DownloadListener() {
+                    @Override
+                    public void progress(int downloadedBytes) {
+                        updateProgress.setProgress(downloadedBytes);
+                    }
+                });
                 return succ ? localApkFile : null;
             } catch (Exception e) {
                 return null;

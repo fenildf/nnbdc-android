@@ -78,7 +78,7 @@
                 android:drawableTop="@drawable/game"
                 android:gravity="center_horizontal|bottom"
                 android:paddingTop="2dp"
-                android:text="游戏"
+                android:text="比赛"
                 android:textColor="@color/bottom_munu_text_color"
                 android:textSize="12dp" />
 

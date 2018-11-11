@@ -66,13 +66,13 @@ public class DownloadAWordTask extends AsyncTask<Void, Void, Boolean/*是否下�
     protected Boolean doInBackground(Void... params) {
         //下载发音文件
         if (spell != null) {
-            Util.downloadFile(soundBaseUrl + Util.getFileNameOfWordSound(spell) + ".mp3", localBasePath + Util.getFileNameOfWordSound(spell) + ".mp3", false);
+            Util.downloadFile(soundBaseUrl + Util.getFileNameOfWordSound(spell) + ".mp3", localBasePath + Util.getFileNameOfWordSound(spell) + ".mp3", false, null);
         }
 
         if (sentenceSounds != null) {
             for (int i = 0; i < sentenceSounds.size(); i++) {
                 String englishDigest = sentenceSounds.get(i);
-                Util.downloadFile(soundBaseUrl + "sentence/" + englishDigest + ".mp3", localBasePath + "sentence/" + englishDigest + ".mp3", false);
+                Util.downloadFile(soundBaseUrl + "sentence/" + englishDigest + ".mp3", localBasePath + "sentence/" + englishDigest + ".mp3", false, null);
             }
         }
         return true;

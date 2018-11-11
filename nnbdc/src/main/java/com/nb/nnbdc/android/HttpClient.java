@@ -17,10 +17,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,6 +49,64 @@ public class HttpClient {
 
     public HttpClient(MyApp appContext) {
         this.appContext = appContext;
+    }
+
+    public int getFileSize(String url) {
+        URLConnection conn = null;
+        try {
+            URL url_ = new URL(url);
+            conn = url_.openConnection();
+            if(conn instanceof HttpURLConnection) {
+                ((HttpURLConnection)conn).setRequestMethod("HEAD");
+            }
+            conn.getInputStream();
+            return conn.getContentLength();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(conn instanceof HttpURLConnection) {
+                ((HttpURLConnection)conn).disconnect();
+            }
+        }
+    }
+
+    public int getFileSize2(String url) throws IOException {
+        try {
+            String responseStr = "";
+
+            URL postUrl = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) (postUrl.openConnection());
+            con.setRequestMethod("HEAD");
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setUseCaches(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setRequestProperty("Accept-Language", "utf-8;zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3");
+            con.setInstanceFollowRedirects(false);
+
+            InputStream is = con.getInputStream();
+
+            InputStreamReader isr = new InputStreamReader(is, "utf-8");
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            while ((line = br.readLine()) != null) {
+                responseStr = responseStr + line;
+            }
+
+            int contentLen = -1;
+            List<String> values = con.getHeaderFields().get("Content-Length");
+            if (null != values && values.size() > 0) {
+                contentLen = Integer.parseInt(values.get(0));
+            }
+
+            Log.i("", "接口：" + url + ",返回结果：" + responseStr);
+
+            return contentLen;
+        } catch (SocketTimeoutException e) {
+            Util.showHintMsg("网络中断", appContext.getHintHandler());
+            return -1;
+        }
     }
 
     public String sendAjax(String url, String data, String contentType, String requestMethod, int timeout) throws IOException {
@@ -121,6 +183,7 @@ public class HttpClient {
         }
     }
 
+
     public String sendAjax(String url, Map<String, Object> parameterMap, String requestMethod, int timeout) throws IOException {
         String parameter = null;
         /** 拼接参数 **/
@@ -155,6 +218,7 @@ public class HttpClient {
         String finalStr = original_SetCookie.substring(0, index);
         return finalStr;
     }
+
 
     public Object[] getNewVersionCodeAndName() throws IOException, JSONException {
         String serviceUrl = appContext.getString(R.string.updateUrl);

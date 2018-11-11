@@ -363,7 +363,7 @@ public class MainActivity extends MyActivity {
         fTransaction.commit();
         currentFragment = russiaFragment;
 
-        setTitle("游戏");
+        setTitle("比赛");
         btnGame.setChecked(true);
         btnGame.setAlpha(alphaForEnable);
 
