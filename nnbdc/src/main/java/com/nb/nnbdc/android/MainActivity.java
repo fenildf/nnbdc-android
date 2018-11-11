@@ -7,17 +7,21 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.github.nkzawa.socketio.client.Ack;
 import com.google.gson.reflect.TypeToken;
 import com.nb.nnbdc.R;
+import com.nb.nnbdc.android.util.Msg;
 import com.nb.nnbdc.android.util.ToastUtil;
 import com.nb.nnbdc.android.util.Util;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +33,10 @@ public class MainActivity extends MyActivity {
     private RadioGroup bottomMenu;
     private RadioButton btnBdc;
     private RadioButton btnRawWord;
-    private RadioButton btnMe;
+
+    private RadioButton btnMeArea;
+    private TextView tvMsgCount;
+
     private RadioButton btnSearch;
     private RadioButton btnGame;
 
@@ -42,6 +49,12 @@ public class MainActivity extends MyActivity {
 
     float alphaForDisable = 0.4f;
     float alphaForEnable = 0.6f;
+
+    public List<Msg> getMsgs() {
+        return msgs;
+    }
+
+    List<Msg> msgs = new ArrayList<>();
 
 
     public MeFragment getMeFragment() {
@@ -61,6 +74,7 @@ public class MainActivity extends MyActivity {
     }
 
     private SelectBookFragment selectBookFragment;
+    private MsgFragment msgFragment;
 
     public BeforeBdcFragment getBeforeBdcActivity() {
         return beforeBdcFragment;
@@ -148,13 +162,10 @@ public class MainActivity extends MyActivity {
                                 String content = sender.getDisplayNickName() + "邀请你进行游戏，级别:" + hallName;
                                 ToastUtil.showToast(MainActivity.this, content);
                                 Util.playSoundByResId(R.raw.explode, MainActivity.this);
-                           /*let msg = {
-                                   type: 'inviteYouToGame',
-                                   content: content,
-                                   sender: sender,
-                                   args: [gameType, room, hallName],
-                                    viewed: false
-                           }*/
+                                Msg msg = new Msg("inviteYouToGame", content, sender, new Object[]{gameType, room, hallName}, false);
+                                msgs.add(msg);
+                                tvMsgCount.setText(String.valueOf(msgs.size()));
+                                tvMsgCount.setVisibility(View.VISIBLE);
                             }
                         } catch (Exception e) {
                             ToastUtil.showToast(MainActivity.this, "系统发生异常：" + e.getMessage());
@@ -218,8 +229,9 @@ public class MainActivity extends MyActivity {
         currentFragment = meFragment;
 
         setTitle("我的学习进度");
-        btnMe.setChecked(true);
-        btnMe.setAlpha(alphaForEnable);
+        btnMeArea.setChecked(true);
+        btnMeArea.setAlpha(alphaForEnable);
+        tvMsgCount.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
     }
@@ -237,6 +249,23 @@ public class MainActivity extends MyActivity {
         currentFragment = selectBookFragment;
 
         setTitle("单词书");
+
+        fireFragmentSwitchEvent(from, currentFragment);
+    }
+
+    public void switchToMsgFragment(MyFragment from) {
+        bottomMenu.setVisibility(View.VISIBLE);
+        FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
+        hideAllFragment(fTransaction);
+        if (msgFragment != null) {
+            fTransaction.remove(msgFragment);
+        }
+        msgFragment = new MsgFragment();
+        fTransaction.add(R.id.main_content, msgFragment);
+        fTransaction.commit();
+        currentFragment = msgFragment;
+
+        setTitle("消息");
 
         fireFragmentSwitchEvent(from, currentFragment);
     }
@@ -390,12 +419,13 @@ public class MainActivity extends MyActivity {
         bottomMenu = (RadioGroup) findViewById(R.id.tab_menu);
         btnBdc = (RadioButton) bottomMenu.findViewById(R.id.btnBdc);
         btnRawWord = (RadioButton) bottomMenu.findViewById(R.id.btnRawWord);
-        btnMe = (RadioButton) bottomMenu.findViewById(R.id.btnMe);
+        btnMeArea = (RadioButton) bottomMenu.findViewById(R.id.btnMe);
+        tvMsgCount = (TextView) bottomMenu.findViewById(R.id.msg_count);
         btnSearch = (RadioButton) bottomMenu.findViewById(R.id.btnSearch);
         btnGame = (RadioButton) bottomMenu.findViewById(R.id.btnGame);
 
         //学习进度按钮
-        btnMe.setOnClickListener(new View.OnClickListener() {
+        btnMeArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchToMeFragment(currentFragment);
@@ -441,9 +471,9 @@ public class MainActivity extends MyActivity {
 
         //设置默认的tab
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            btnMe.callOnClick();
+            btnMeArea.callOnClick();
         } else {
-            btnMe.performClick();
+            btnMeArea.performClick();
         }
     }
 
@@ -451,7 +481,8 @@ public class MainActivity extends MyActivity {
     private void hideAllFragment(FragmentTransaction fTransaction) {
         btnBdc.setAlpha(alphaForDisable);
         btnRawWord.setAlpha(alphaForDisable);
-        btnMe.setAlpha(alphaForDisable);
+        btnMeArea.setAlpha(alphaForDisable);
+        tvMsgCount.setAlpha(alphaForDisable);
         btnSearch.setAlpha(alphaForDisable);
         btnGame.setAlpha(alphaForDisable);
 
@@ -484,6 +515,9 @@ public class MainActivity extends MyActivity {
         }
         if (russiaFragment != null) {
             fTransaction.hide(russiaFragment);
+        }
+        if (msgFragment != null) {
+            fTransaction.hide(msgFragment);
         }
     }
 

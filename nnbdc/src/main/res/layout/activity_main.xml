@@ -82,19 +82,40 @@
                 android:textColor="@color/bottom_munu_text_color"
                 android:textSize="12dp" />
 
-            <RadioButton
-                android:id="@+id/btnMe"
+            <FrameLayout
+                android:id="@+id/btnMeArea"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@drawable/me"
-                android:gravity="center_horizontal|bottom"
-                android:paddingTop="2dp"
-                android:text="我"
-                android:textColor="@color/bottom_munu_text_color"
-                android:textSize="12dp" />
+                android:layout_weight="1">
+
+                <RadioButton
+                    android:id="@+id/btnMe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+
+                    android:button="@null"
+                    android:drawableTop="@drawable/me"
+                    android:gravity="center_horizontal|bottom"
+                    android:paddingTop="2dp"
+                    android:text="我"
+                    android:textColor="@color/bottom_munu_text_color"
+                    android:textSize="12dp" />
+
+                <TextView
+                    android:id="@+id/msg_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginRight="16dp"
+                    android:background="@drawable/textview_style"
+                    android:text="0"
+                    android:textColor="#ddd"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+
         </RadioGroup>
 
 

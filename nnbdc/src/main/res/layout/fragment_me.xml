@@ -275,5 +275,15 @@
             android:background="@color/buttonBackground"
             android:text="开始学习"
             android:textColor="@color/defaultTextColor" />
+
+        <Button
+            android:id="@+id/msgBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="1dp"
+            android:layout_weight="1"
+            android:background="@color/buttonBackground"
+            android:text="消息"
+            android:textColor="@color/defaultTextColor" />
     </LinearLayout>
 </LinearLayout>

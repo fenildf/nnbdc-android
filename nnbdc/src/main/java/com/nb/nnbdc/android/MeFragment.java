@@ -122,6 +122,13 @@ public class MeFragment extends MyFragment {
             }
         });
 
+        getView().findViewById(R.id.msgBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getMainActivity().switchToMsgFragment(MeFragment.this);
+            }
+        });
+
         getView().findViewById(R.id.rawWordBook).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
