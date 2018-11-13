@@ -95,6 +95,7 @@ public class MyApp extends Application {
                 for (SocketStatusListener listener : socketStatusListeners) {
                     listener.onDisconnected();
                 }
+                socket.connect(); //重连
             }
         });
         socket.connect();
