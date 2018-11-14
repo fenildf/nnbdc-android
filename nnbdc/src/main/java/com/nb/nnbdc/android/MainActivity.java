@@ -42,7 +42,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
     private RadioButton btnSearch;
     private RadioButton btnGame;
 
-    private int selectedBtnTextColor;
+    private int selectedBtnTextColor = -1;
 
     public int getUnReadMsgCount() {
         int count = 0;
@@ -274,7 +274,9 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("我的学习进度");
         btnMe.setChecked(true);
-        btnMe.setTextColor(selectedBtnTextColor);
+        if (selectedBtnTextColor != -1) { // MeFragment是程序启动后第一个页面，所以有可能颜色还没有初始化
+            btnMe.setTextColor(selectedBtnTextColor);
+        }
         btnMe.setAlpha(alphaForEnable);
         tvMsgCount.setAlpha(alphaForEnable);
 
