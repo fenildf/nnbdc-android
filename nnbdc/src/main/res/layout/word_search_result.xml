@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
-    android:background="#ee223322"
+    android:background="@drawable/dialog_style"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -55,6 +55,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:scaleType="fitXY"
+            android:layout_marginTop="-6dp"
             android:src="@drawable/close" />
     </LinearLayout>
 
