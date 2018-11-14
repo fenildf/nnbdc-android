@@ -26,6 +26,7 @@
     <color name="toastTextColor">#aaaaaa</color>
     <color name="defaultButtonTextColor">#fff</color>
     <color name="bottomMenuTextColorSelected">#F2CA27</color>
+    <color name="bottomMenuTextColorNormal">#aaa</color>
     <color name="bottomMenuBackGround">#012C35</color>
     <color name="black_overlay">#66000000</color>
     <color name="msg_text_unread">#ddd</color>

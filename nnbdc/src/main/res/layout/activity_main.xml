@@ -37,7 +37,7 @@
                 android:gravity="center_horizontal|bottom"
                 android:paddingTop="2dp"
                 android:text="学习"
-                android:textColor="@color/bottom_munu_text_color"
+                android:textColor="@color/bottomMenuTextColorNormal"
                 android:textSize="12dp" />
 
             <RadioButton
@@ -51,7 +51,7 @@
                 android:gravity="center_horizontal|bottom"
                 android:paddingTop="2dp"
                 android:text="生词本"
-                android:textColor="@color/bottom_munu_text_color"
+                android:textColor="@color/bottomMenuTextColorNormal"
                 android:textSize="12dp" />
 
             <RadioButton
@@ -65,7 +65,7 @@
                 android:gravity="center_horizontal|bottom"
                 android:paddingTop="2dp"
                 android:text="查词"
-                android:textColor="@color/bottom_munu_text_color"
+                android:textColor="@color/bottomMenuTextColorNormal"
                 android:textSize="12dp" />
 
             <RadioButton
@@ -79,7 +79,7 @@
                 android:gravity="center_horizontal|bottom"
                 android:paddingTop="2dp"
                 android:text="比赛"
-                android:textColor="@color/bottom_munu_text_color"
+                android:textColor="@color/bottomMenuTextColorNormal"
                 android:textSize="12dp" />
 
             <FrameLayout
@@ -93,13 +93,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-
                     android:button="@null"
                     android:drawableTop="@drawable/me"
                     android:gravity="center_horizontal|bottom"
                     android:paddingTop="2dp"
                     android:text="我"
-                    android:textColor="@color/bottom_munu_text_color"
+                    android:textColor="@color/bottomMenuTextColorNormal"
                     android:textSize="12dp" />
 
                 <TextView

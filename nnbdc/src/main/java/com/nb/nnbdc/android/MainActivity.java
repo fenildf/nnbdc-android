@@ -2,6 +2,7 @@ package com.nb.nnbdc.android;
 
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -35,11 +36,13 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
     private RadioButton btnBdc;
     private RadioButton btnRawWord;
 
-    private RadioButton btnMeArea;
+    private RadioButton btnMe;
     private TextView tvMsgCount;
 
     private RadioButton btnSearch;
     private RadioButton btnGame;
+
+    private int selectedBtnTextColor;
 
     public int getUnReadMsgCount() {
         int count = 0;
@@ -196,6 +199,8 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
                 });
             }
         });
+
+        selectedBtnTextColor = getResources().getColor(R.color.bottomMenuTextColorSelected);
     }
 
     @Override
@@ -249,6 +254,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("生词本");
         btnRawWord.setChecked(true);
+        btnRawWord.setTextColor(selectedBtnTextColor);
         btnRawWord.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -267,8 +273,9 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
         currentFragment = meFragment;
 
         setTitle("我的学习进度");
-        btnMeArea.setChecked(true);
-        btnMeArea.setAlpha(alphaForEnable);
+        btnMe.setChecked(true);
+        btnMe.setTextColor(selectedBtnTextColor);
+        btnMe.setAlpha(alphaForEnable);
         tvMsgCount.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -323,6 +330,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("查找单词");
         btnSearch.setChecked(true);
+        btnSearch.setTextColor(selectedBtnTextColor);
         btnSearch.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -342,6 +350,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("游戏大厅");
         btnGame.setChecked(true);
+        btnGame.setTextColor(selectedBtnTextColor);
         btnGame.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -361,6 +370,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("比赛");
         btnGame.setChecked(true);
+        btnGame.setTextColor(selectedBtnTextColor);
         btnGame.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -380,6 +390,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("今日学习计划");
         btnBdc.setChecked(true);
+        btnBdc.setTextColor(selectedBtnTextColor);
         btnBdc.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -405,6 +416,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("背单词");
         btnBdc.setChecked(true);
+        btnBdc.setTextColor(selectedBtnTextColor);
         btnBdc.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -424,6 +436,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("今日学习已完成");
         btnBdc.setChecked(true);
+        btnBdc.setTextColor(selectedBtnTextColor);
         btnBdc.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -443,6 +456,7 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         setTitle("阶段复习");
         btnBdc.setChecked(true);
+        btnBdc.setTextColor(selectedBtnTextColor);
         btnBdc.setAlpha(alphaForEnable);
 
         fireFragmentSwitchEvent(from, currentFragment);
@@ -457,13 +471,13 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
         bottomMenu = (RadioGroup) findViewById(R.id.tab_menu);
         btnBdc = (RadioButton) bottomMenu.findViewById(R.id.btnBdc);
         btnRawWord = (RadioButton) bottomMenu.findViewById(R.id.btnRawWord);
-        btnMeArea = (RadioButton) bottomMenu.findViewById(R.id.btnMe);
+        btnMe = (RadioButton) bottomMenu.findViewById(R.id.btnMe);
         tvMsgCount = (TextView) bottomMenu.findViewById(R.id.msg_count);
         btnSearch = (RadioButton) bottomMenu.findViewById(R.id.btnSearch);
         btnGame = (RadioButton) bottomMenu.findViewById(R.id.btnGame);
 
         //学习进度按钮
-        btnMeArea.setOnClickListener(new View.OnClickListener() {
+        btnMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchToMeFragment(currentFragment);
@@ -509,20 +523,27 @@ public class MainActivity extends MyActivity implements MyApp.SocketStatusListen
 
         //设置默认的tab
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            btnMeArea.callOnClick();
+            btnMe.callOnClick();
         } else {
-            btnMeArea.performClick();
+            btnMe.performClick();
         }
     }
 
     //隐藏所有Fragment
     private void hideAllFragment(FragmentTransaction fTransaction) {
+        int default_text_color = getResources().getColor(R.color.bottomMenuTextColorNormal);
         btnBdc.setAlpha(alphaForDisable);
+        btnBdc.setTextColor(default_text_color);
         btnRawWord.setAlpha(alphaForDisable);
-        btnMeArea.setAlpha(alphaForDisable);
+        btnRawWord.setTextColor(default_text_color);
+        btnMe.setAlpha(alphaForDisable);
+        btnMe.setTextColor(default_text_color);
         tvMsgCount.setAlpha(alphaForDisable);
+        tvMsgCount.setTextColor(default_text_color);
         btnSearch.setAlpha(alphaForDisable);
+        btnSearch.setTextColor(default_text_color);
         btnGame.setAlpha(alphaForDisable);
+        btnGame.setTextColor(default_text_color);
 
         if (meFragment != null) {
             fTransaction.hide(meFragment);
