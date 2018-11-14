@@ -29,7 +29,7 @@ import java.util.List;
 import beidanci.vo.UserVo;
 
 
-public class MainActivity extends MyActivity {
+public class MainActivity extends MyActivity implements MyApp.SocketStatusListener {
 
     private RadioGroup bottomMenu;
     private RadioButton btnBdc;
@@ -51,7 +51,7 @@ public class MainActivity extends MyActivity {
         return count;
     }
 
-    public int getAllMsgCount(){
+    public int getAllMsgCount() {
         return msgs.size();
     }
 
@@ -153,17 +153,7 @@ public class MainActivity extends MyActivity {
         initView();
 
         // 监听socket状态变化
-        getAppContext().registerSocketStatusListener(new MyApp.SocketStatusListener() {
-            @Override
-            public void onConnected() {
-                tryReportUserToSocketServer();
-            }
-
-            @Override
-            public void onDisconnected() {
-                tryReportUserToSocketServer();
-            }
-        });
+        getAppContext().registerSocketStatusListener(this);
         tryReportUserToSocketServer();
 
         // 监听某些全局性的socket事件
@@ -206,6 +196,12 @@ public class MainActivity extends MyActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        getAppContext().unregisterSocketStatusListener(this);
+        super.onDestroy();
     }
 
     public void renderUnViewdMsgCount() {
@@ -591,6 +587,16 @@ public class MainActivity extends MyActivity {
     public void unRegisterNewMsgListener(NewMsgListener listener) {
         boolean success = newMsgListeners.remove(listener);
         Assert.assertTrue(success);
+    }
+
+    @Override
+    public void onConnected() {
+        tryReportUserToSocketServer();
+    }
+
+    @Override
+    public void onDisconnected() {
+        tryReportUserToSocketServer();
     }
 
     public interface NewMsgListener {

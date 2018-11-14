@@ -67,6 +67,10 @@ public class MyApp extends Application {
         socketStatusListeners.add(listener);
     }
 
+    public void unregisterSocketStatusListener(SocketStatusListener listener) {
+        socketStatusListeners.remove(listener);
+    }
+
     private void initSocket() throws URISyntaxException {
         IO.Options opts = new IO.Options();
         opts.forceNew = true;
@@ -95,7 +99,6 @@ public class MyApp extends Application {
                 for (SocketStatusListener listener : socketStatusListeners) {
                     listener.onDisconnected();
                 }
-                socket.connect(); //重连
             }
         });
         socket.connect();
@@ -108,6 +111,11 @@ public class MyApp extends Application {
     private class HeartBeatTask extends TimerTask {
         @Override
         public void run() {
+            // 连接中断则重连
+            if(!socket.connected()){
+                socket.connect();
+            }
+
             socket.emit("heartBeat", "");
         }
     }

@@ -43,7 +43,7 @@ import beidanci.vo.WordVo;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 
 
-public class RussiaFragment extends MyFragment {
+public class RussiaFragment extends MyFragment implements MyApp.SocketStatusListener {
     private MediaPlayer mediaPlayer = new MediaPlayer();
 
     private Socket socket;
@@ -84,6 +84,8 @@ public class RussiaFragment extends MyFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        getMainActivity().getAppContext().registerSocketStatusListener(this);
 
         initGame();
     }
@@ -765,6 +767,14 @@ public class RussiaFragment extends MyFragment {
                 } else {
                     gameResult.setVisibility(View.GONE);
                 }
+
+                // 连接中断告警
+                TextView connectionBrokenWarn = (TextView) getView().findViewById(R.id.connectionBrokenWarn);
+                if (socket.connected()) {
+                    connectionBrokenWarn.setVisibility(View.GONE);
+                } else {
+                    connectionBrokenWarn.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -985,6 +995,12 @@ public class RussiaFragment extends MyFragment {
         timer = null;
         showingResultTimer.cancel();
         showingResultTimer = null;
+        getAvailableActivity(new IActivityEnabledListener() {
+            @Override
+            public void onActivityEnabled(MainActivity activity) {
+                activity.getAppContext().unregisterSocketStatusListener(RussiaFragment.this);
+            }
+        });
         super.onDestroyView();
     }
 
@@ -1020,6 +1036,16 @@ public class RussiaFragment extends MyFragment {
     boolean isExercise = false;
     String wordSoundFile = "";
     List<UserVo> idleUsers = new ArrayList<>();
+
+    @Override
+    public void onConnected() {
+
+    }
+
+    @Override
+    public void onDisconnected() {
+
+    }
 
     private class Player {
         protected Player(String code) {

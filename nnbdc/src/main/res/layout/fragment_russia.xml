@@ -641,4 +641,14 @@
             android:textColor="@color/defaultTextColor" />
     </LinearLayout>
 
+    <!--连接中断告警-->
+    <TextView
+        android:id="@+id/connectionBrokenWarn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="连接中断！"
+        android:textAlignment="center"
+        android:textColor="#f00"
+        android:visibility="gone" />
 </LinearLayout>
